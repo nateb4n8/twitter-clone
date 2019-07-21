@@ -1,0 +1,32 @@
+{
+  "name": "twitter-clone",
+  "version": "0.1.0",
+  "description": "Clone of Twitter's PWA",
+  "main": "index.js",
+  "scripts": {
+    "test": "cd app && npm test",
+    "test-no-watch": "cd app && CI=true npm test -- --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/logic0verflow/twitter-clone.git"
+  },
+  "keywords": [
+    "Twitter",
+    "PWA"
+  ],
+  "author": "Nathan Acosta",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/logic0verflow/twitter-clone/issues"
+  },
+  "homepage": "https://github.com/logic0verflow/twitter-clone#readme",
+  "devDependencies": {
+    "husky": "^3.0.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run test-no-watch"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "extends": [
+    "eslint:recommended", 
+    "plugin:react/recommended", 
+    "airbnb"
+  ],
+  "settings": {
+    "react": {
+      "createClass": "createReactClass",
+      "pragma": "React",
+      "version": "16.0",
+      "flowVersion": "0.53"
+    },
+    "propWrapperFunctions": [ "forbidExtraProps" ]
+  },
+  "parser": "babel-eslint",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true,
+      "modules": true
+    }
+  },
+  "rules": {
+    "react/forbid-prop-types": ["off"],
+    "brace-style": [2, "stroustrup", { "allowSingleLine": true }]
+  }
+}
