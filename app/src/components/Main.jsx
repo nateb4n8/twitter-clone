@@ -7,16 +7,29 @@ import {
   Fab, Button, Box, TextField, CardHeader, Card, IconButton, CardContent, ListItem, List, ListItemAvatar, Avatar, ListItemText, ListItemSecondaryAction,
 } from '@material-ui/core';
 
+import Navigation from './Navigation';
+
 const useStyles = makeStyles(() => ({
   paper: {
     backgroundColor: '#444',
     width: '100%',
-    height: 360,
+    padding: 8,
   },
   home: {
     width: '100%',
   },
 }));
+
+
+const menuItems = [
+  { label: 'Home', link: '#Home' },
+  { label: 'Explore', link: '#Explore' },
+  { label: 'Notifications', link: '#Notifications' },
+  { label: 'Messages', link: '#Messages' },
+  { label: 'Bookmarks', link: '#Bookmarks' },
+  { label: 'Lists', link: '#Lists' },
+  { label: 'Profile', link: '#Profile' },
+];
 
 function Main() {
   const classes = useStyles();
@@ -26,17 +39,7 @@ function Main() {
       <Grid container justify="center">
         <Grid item xs={3}>
           <Paper className={classes.paper}>
-            <Grid container direction="column" spacing={1}>
-              <Grid item><Fab variant="extended">Home</Fab></Grid>
-              <Grid item><Fab variant="extended">Explore</Fab></Grid>
-              <Grid item><Fab variant="extended">Notifications</Fab></Grid>
-              <Grid item><Fab variant="extended">Messages</Fab></Grid>
-              <Grid item><Fab variant="extended">Bookmarks</Fab></Grid>
-              <Grid item><Fab variant="extended">Lists</Fab></Grid>
-              <Grid item><Fab variant="extended">Profile</Fab></Grid>
-              <Grid item><Fab variant="extended">More</Fab></Grid>
-              <Grid item><Fab variant="extended">Tweet</Fab></Grid>
-            </Grid>
+            <Navigation items={menuItems} />
           </Paper>
         </Grid>
         <Grid item xs={5}>
