@@ -4,6 +4,7 @@ import React from 'react';
 import Enzyme, { mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
+import { createMount } from '@material-ui/core/test-utils';
 
 import Navigation from './Navigation';
 
@@ -18,16 +19,18 @@ describe('<Navigation />', () => {
   const labels = menuItems.map(i => i.label);
   const links = menuItems.map(i => i.link);
 
+  let mount;
+
   beforeEach(() => {
     sinon.stub(console, 'error');
+
+    mount = createMount();
   });
 
   afterEach(() => {
     console.error.restore();
-  });
 
-  it('renders without crashing', () => {
-    mount(<Navigation />);
+    mount.cleanUp();
   });
 
   it('renders with menu links', () => {
@@ -35,10 +38,22 @@ describe('<Navigation />', () => {
 
     const anchors = wrapper.find('a');
 
-    expect(anchors.length).toBe(3);
+    let matchCount = 0;
     anchors.forEach((anchor) => {
-      expect(labels).toContain(anchor.text());
-      expect(links).toContain(anchor.props().href);
+      const text = anchor.text();
+      const { href } = anchor.props();
+      const matches = menuItems.filter(item => item.label === text && item.link === href);
+      matchCount += matches.length === 1 ? 1 : 0;
     });
+
+    expect(matchCount).toBe(menuItems.length);
+  });
+
+  it('renders with a compose Tweet link', () => {
+    const wrapper = mount(<Navigation />);
+
+    const anchors = wrapper.find('a').findWhere(a => a.props().href && a.text() === 'Tweet');
+
+    expect(anchors.length).toBe(1);
   });
 });

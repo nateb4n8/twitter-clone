@@ -9,6 +9,10 @@ const Navigation = ({ items }) => (
         <Fab variant="extended" href={link}>{label}</Fab>
       </Grid>
     ))}
+
+    <Grid item>
+      <Fab variant="extended" href="#compose-tweet">Tweet</Fab>
+    </Grid>
   </Grid>
 );
 
