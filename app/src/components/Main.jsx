@@ -6,6 +6,14 @@ import Paper from '@material-ui/core/Paper';
 import {
   Fab, Button, Box, TextField, CardHeader, Card, IconButton, CardContent, ListItem, List, ListItemAvatar, Avatar, ListItemText, ListItemSecondaryAction,
 } from '@material-ui/core';
+import Home from '@material-ui/icons/Home';
+import Notifications from '@material-ui/icons/Notifications';
+import Messages from '@material-ui/icons/Email';
+import Bookmark from '@material-ui/icons/Bookmark';
+import ListIcon from '@material-ui/icons/List';
+import Face from '@material-ui/icons/Face';
+import Explore from '@material-ui/icons/Explore';
+
 
 import Navigation from './Navigation';
 
@@ -22,13 +30,13 @@ const useStyles = makeStyles(() => ({
 
 
 const menuItems = [
-  { label: 'Home', link: '#Home' },
-  { label: 'Explore', link: '#Explore' },
-  { label: 'Notifications', link: '#Notifications' },
-  { label: 'Messages', link: '#Messages' },
-  { label: 'Bookmarks', link: '#Bookmarks' },
-  { label: 'Lists', link: '#Lists' },
-  { label: 'Profile', link: '#Profile' },
+  { label: 'Home', link: '#Home', icon: <Home /> },
+  { label: 'Explore', link: '#Explore', icon: <Explore /> },
+  { label: 'Notifications', link: '#Notifications', icon: <Notifications /> },
+  { label: 'Messages', link: '#Messages', icon: <Messages /> },
+  { label: 'Bookmarks', link: '#Bookmarks', icon: <Bookmark /> },
+  { label: 'Lists', link: '#Lists', icon: <ListIcon /> },
+  { label: 'Profile', link: '#Profile', icon: <Face /> },
 ];
 
 function Main() {
@@ -37,12 +45,12 @@ function Main() {
   return (
     <Container>
       <Grid container justify="center">
-        <Grid item xs={3}>
+        <Grid item xs={1} lg={3}>
           <Paper className={classes.paper}>
             <Navigation items={menuItems} />
           </Paper>
         </Grid>
-        <Grid item xs={5}>
+        <Grid item xs={6} lg={5}>
           <Paper className={classes.paper}>
             <Grid container direction="column">
               <Grid item xs={12} container>
@@ -56,7 +64,7 @@ function Main() {
             </Grid>
           </Paper>
         </Grid>
-        <Grid item xs={4}>
+        <Grid item xs={5} lg={4}>
           <Paper className={classes.paper}>
             <Grid container direction="column">
               <Grid item xs={12}>
