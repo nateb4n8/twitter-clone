@@ -8,7 +8,7 @@ import AppTheme from './components/AppTheme';
 function App() {
   return (
     <AppTheme>
-      <CreateAccount />
+      <Login />
     </AppTheme>
   );
 }

@@ -7,11 +7,23 @@ import GroupIcon from '@material-ui/icons/GroupOutlined';
 import MessageIcon from '@material-ui/icons/MessageOutlined';
 
 const useStyles = makeStyles(theme => ({
+  pane: {
+    [theme.breakpoints.up('sm')]: {
+      height: '100vh',
+    },
+    [theme.breakpoints.down('sm')]: {
+      flexDirection: 'column-reverse',
+      height: 'auto',
+    },
+  },
   leftPanel: {
     backgroundColor: theme.palette.primary.main,
   },
   fullHeight: {
-    height: '100vh',
+    [theme.breakpoints.up('md')]: {
+      height: '100vh',
+    },
+    padding: 16,
   },
   list: {
     color: '#fff',
@@ -46,8 +58,8 @@ function Login() {
   const classes = useStyles();
 
   return (
-    <Grid container className={classes.fullHeight} alignItems="stretch">
-      <Grid item sm={6} className={classes.leftPanel}>
+    <Grid container className={classes.pane} alignItems="stretch">
+      <Grid item md={6} className={classes.leftPanel}>
         <Grid container justify="center" alignItems="center" className={classes.fullHeight}>
           <List className={classes.list}>
             <ListItem>
@@ -65,7 +77,7 @@ function Login() {
           </List>
         </Grid>
       </Grid>
-      <Grid item sm={6}>
+      <Grid item md={6}>
         <Grid container justify="center" alignItems="center" className={classes.fullHeight}>
           <Grid container direction="column" alignItems="stretch" spacing={2} className={classes.content}>
             <Grid item>
