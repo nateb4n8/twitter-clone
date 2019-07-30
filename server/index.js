@@ -1,8 +1,13 @@
 const express = require('express');
 
+const { port } = require('./startup/config');
+const winston = require('./startup/logger');
+
 const app = express();
 
-// TODO: setup config
-// TODO: setup logging
+const server = app.listen(
+  port, 
+  () => winston.info(`Listening on port: ${port}`)
+);
 
-const server = app.listen(3000, () => console.log('Server started'));
+module.exports = server;
