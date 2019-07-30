@@ -1,0 +1,11 @@
+version: '2.0'
+
+services:
+
+  mongo:
+    image: mongo:4
+    env_file:
+      - mongo-variables.env
+    ports:
+      - "27017:27017"
+
