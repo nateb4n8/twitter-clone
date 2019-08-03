@@ -1,7 +1,10 @@
 import React from 'react';
-import {
-  Grid, makeStyles, Card, CardContent, Container, TextField, Fab, Typography,
-} from '@material-ui/core';
+import { makeStyles } from '@material-ui/core';
+import Grid from '@material-ui/core/Grid';
+import Container from '@material-ui/core/Container';
+import TextField from '@material-ui/core/TextField';
+import Fab from '@material-ui/core/Fab';
+import Typography from '@material-ui/core/Typography';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -12,7 +15,7 @@ const useStyles = makeStyles(theme => ({
 
 function TextInput(props) {
   const {
-    label, onChange, type, autoFocus,
+    label, type, autoFocus,
   } = props;
   return (
     <TextField
