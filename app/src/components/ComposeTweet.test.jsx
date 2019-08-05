@@ -52,7 +52,7 @@ describe('<ComposeTweet />', () => {
     const wrapper = mount(<ComposeTweet />);
 
     const textInput = wrapper
-      .find('input')
+      .find('textarea')
       .filterWhere(input => input.props().name === 'tweet-content');
 
     expect(textInput.exists()).toBe(true);

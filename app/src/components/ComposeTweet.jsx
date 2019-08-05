@@ -15,6 +15,7 @@ import InsertPhoto from '@material-ui/icons/InsertPhoto';
 import Gif from '@material-ui/icons/Gif';
 import Poll from '@material-ui/icons/Poll';
 import Mood from '@material-ui/icons/Mood';
+import { CircularProgress } from '@material-ui/core';
 
 const useStyles = makeStyles({
   dialog: {
@@ -30,13 +31,16 @@ const useStyles = makeStyles({
     textTransform: 'none',
     padding: '0px 8px',
   },
+  spacer: {
+    flexGrow: 1,
+  },
 });
 
 
 function ComposeTweet() {
   const classes = useStyles();
   const theme = useTheme();
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
   const paperProps = fullScreen ? {} : { className: classes.paper };
   return (
     <Dialog
@@ -48,70 +52,69 @@ function ComposeTweet() {
       PaperProps={paperProps}
     >
       <DialogContent className={classes.content}>
-        <Grid container justify="space-between">
+        <Grid container direction="column" spacing={2}>
           <Grid item>
-            <IconButton
-              size="small"
-              name="go-back"
-            >
-              <ArrowBack />
-            </IconButton>
+            <Grid container justify="space-between">
+              <Grid item>
+                <IconButton size="small" name="go-back">
+                  <ArrowBack />
+                </IconButton>
+              </Grid>
+              <Grid item>
+                <Fab name="tweet-submit" variant="extended" size="small" color="primary">
+                  <Typography className={classes.next}>Tweet</Typography>
+                </Fab>
+              </Grid>
+            </Grid>
           </Grid>
           <Grid item>
-            <Fab
-              name="tweet-submit"
-              variant="extended"
-              size="small"
-              color="primary"
-            >
-              <Typography className={classes.next}>
-                Tweet
-              </Typography>
-            </Fab>
+            <Divider />
+          </Grid>
+          <Grid item>
+            <Grid container>
+              <Grid item xs={12}>
+                <TextField fullWidth multiline name="tweet-content" rows={5} />
+              </Grid>
+            </Grid>
+          </Grid>
+          <Grid item>
+            <Grid container alignItems="center">
+              <Grid item>
+                <FormLabel htmlFor="add-image">
+                  <IconButton size="small" name="add-image" component="span">
+                    <InsertPhoto />
+                  </IconButton>
+                </FormLabel>
+                <input
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  id="add-image"
+                  multiple
+                  type="file"
+                />
+              </Grid>
+              <Grid item>
+                <IconButton size="small" name="add-gif">
+                  <Gif />
+                </IconButton>
+              </Grid>
+              <Grid item>
+                <IconButton size="small" name="add-poll">
+                  <Poll />
+                </IconButton>
+              </Grid>
+              <Grid item>
+                <IconButton size="small" name="add-emoji">
+                  <Mood />
+                </IconButton>
+              </Grid>
+              <Grid item className={classes.spacer} />
+              <Grid item>
+                <CircularProgress variant="static" value={75} size={25} />
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
-
-        <Divider />
-
-        <Grid container>
-          <Grid item xs={12}>
-            <TextField fullWidth name="tweet-content" />
-          </Grid>
-        </Grid>
-
-        <Grid container>
-          <Grid item>
-            <FormLabel htmlFor="add-image">
-              <IconButton size="small" name="add-image" component="span">
-                <InsertPhoto />
-              </IconButton>
-            </FormLabel>
-            <input
-              accept="image/*"
-              style={{ display: 'none' }}
-              id="add-image"
-              multiple
-              type="file"
-            />
-
-          </Grid>
-          <Grid item>
-            <IconButton size="small" name="add-gif">
-              <Gif />
-            </IconButton>
-          </Grid>
-          <Grid item>
-            <IconButton size="small" name="add-poll">
-              <Poll />
-            </IconButton>
-          </Grid>
-          <Grid item>
-            <IconButton size="small" name="add-emoji">
-              <Mood />
-            </IconButton>
-          </Grid>
-        </Grid>
-
       </DialogContent>
     </Dialog>
   );
