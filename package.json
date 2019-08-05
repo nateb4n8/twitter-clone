@@ -4,6 +4,9 @@
   "description": "Clone of Twitter's PWA",
   "main": "index.js",
   "scripts": {
+    "app": "cd app && npm start",
+    "server": "cd server && npm start",
+    "containers": "docker-compose -f ./docker/docker-compose.yml up",
     "test": "cd app && npm test",
     "test-no-watch": "cd app && CI=true npm test -- --coverage"
   },
