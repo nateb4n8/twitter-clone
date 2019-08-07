@@ -31,5 +31,8 @@
     "hooks": {
       "pre-commit": "npm run test-no-watch"
     }
+  },
+  "dependencies": {
+    "@hapi/joi": "^15.1.0"
   }
 }

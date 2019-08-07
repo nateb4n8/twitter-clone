@@ -2,10 +2,14 @@ const express = require('express');
 
 const { port } = require('./startup/config');
 const winston = require('./startup/logger');
-const db = require('./startup/db');
-const routes = require('./src/controllers/index.router');
+const attachDB = require('./startup/db');
+const routes = require('./src/routers/index.router');
 
 const app = express();
+
+attachDB(app);
+
+app.use(express.json());
 
 app.use(routes);
 
