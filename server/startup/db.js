@@ -15,7 +15,7 @@ function decorate(app) {
     if (err) return winston.error('Unable to connect to DB');
 
     winston.info('Connected to DB');
-    app.locals.db = newClient;
+    app.locals.db = newClient.db('twitter');
   });
 }
 
