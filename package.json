@@ -33,6 +33,7 @@
     }
   },
   "dependencies": {
-    "@hapi/joi": "^15.1.0"
+    "@hapi/joi": "^15.1.0",
+    "jsonwebtoken": "^8.5.1"
   }
 }
