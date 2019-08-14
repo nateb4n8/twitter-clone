@@ -55,7 +55,7 @@ describe('<Profile />', () => {
 
     const handle = wrapper
       .find('span')
-      .filterWhere(item => item.text() === validProps.handle);
+      .filterWhere(item => item.text() === `@${validProps.handle}`);
     expect(handle.exists()).toBe(true);
   });
 
@@ -69,16 +69,32 @@ describe('<Profile />', () => {
 
     const joinDate = wrapper
       .find('span')
-      .filterWhere(item => item.text() === validProps.joinDate);
+      .filterWhere(item => item.text() === `Joined ${validProps.joinDate}`);
     expect(joinDate.exists()).toBe(true);
   });
 
-  it.skip('renders the following and follower counts', () => {
+  it('renders following and follower counts', () => {
     const wrapper = mount(<Profile {...validProps} />);
 
-    const profileName = wrapper
-      .find('h3')
-      .filterWhere(item => item.text() === validProps.profileName);
-    expect(profileName.exists()).toBe(true);
+    const { followingAmt, followerAmt } = validProps;
+
+    const followingText = wrapper
+      .find('span')
+      .filterWhere(item => item.text() === `${followingAmt} Following`);
+    expect(followingText.exists()).toBe(true);
+
+    const followerText = wrapper
+      .find('span')
+      .filterWhere(item => item.text() === `${followerAmt} Followers`);
+    expect(followerText.exists()).toBe(true);
+  });
+
+  it('renders an edit profile button', () => {
+    const wrapper = mount(<Profile {...validProps} />);
+
+    const editButton = wrapper
+      .find('button')
+      .filterWhere(btn => btn.props().name === 'editProfile');
+    expect(editButton.exists()).toBe(true);
   });
 });
