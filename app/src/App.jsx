@@ -1,7 +1,8 @@
 import React from 'react';
 
 import AppTheme from './components/AppTheme';
-import Profile from './components/Profile';
+import EditProfile from './components/EditProfile';
+// import Profile from './components/Profile';
 // import ComposeTweet from './components/ComposeTweet';
 // import Main from './components/Main';
 // import Join from './components/Join';
@@ -21,7 +22,8 @@ const profileProps = {
 function App() {
   return (
     <AppTheme>
-      <Profile {...profileProps} />
+      {/* <Profile {...profileProps} /> */}
+      <EditProfile />
     </AppTheme>
   );
 }

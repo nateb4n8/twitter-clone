@@ -22,6 +22,7 @@
   },
   "rules": {
     "react/forbid-prop-types": ["off"],
+    "object-curly-newline": ["off"],
     "brace-style": [2, "stroustrup", { "allowSingleLine": true }]
   }
 }
