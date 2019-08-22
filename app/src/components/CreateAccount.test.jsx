@@ -28,14 +28,25 @@ describe('<CreateAccount />', () => {
     muiMount.cleanUp();
   });
 
-  it('renders with a `next` button', () => {
+  it('renders with a `submit` button', () => {
     const wrapper = mount(<CreateAccount />);
 
-    const nextButton = wrapper
+    const submitButton = wrapper
       .find('button')
-      .filterWhere(btn => btn.props().name === 'next');
+      .filterWhere(btn => btn.props().name === 'submit');
 
-    expect(nextButton.exists()).toBe(true);
+    expect(submitButton.exists()).toBe(true);
+  });
+
+  it.skip('should call onClick callback when clicked', () => {
+    const wrapper = mount(<CreateAccount />);
+
+    const submitButton = wrapper
+      .find('button')
+      .filterWhere(btn => btn.props().name === 'submit');
+    submitButton.simulate('click');
+
+    expect(submitButton.exists()).toBe(true);
   });
 
   it('renders with a `name` input', () => {

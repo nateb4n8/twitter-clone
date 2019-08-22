@@ -1,6 +1,7 @@
 /* eslint-env jest */
 
 import React from 'react';
+import { MemoryRouter } from 'react-router-dom';
 import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
@@ -24,11 +25,11 @@ describe('<Login />', () => {
   });
 
   it('renders without crashing', () => {
-    mount(<Join />);
+    mount(<MemoryRouter><Join /></MemoryRouter>);
   });
 
   it('renders with a Log In link', () => {
-    const wrapper = mount(<Join />);
+    const wrapper = mount(<MemoryRouter><Join /></MemoryRouter>);
     const loginAnchor = wrapper
       .find('a')
       .filterWhere(a => a.props().href === '/login');
@@ -37,7 +38,7 @@ describe('<Login />', () => {
   });
 
   it('renders with a Sign Up link', () => {
-    const wrapper = mount(<Join />);
+    const wrapper = mount(<MemoryRouter><Join /></MemoryRouter>);
     const signupAnchor = wrapper
       .find('a')
       .filterWhere(a => a.props().href === '/signup');

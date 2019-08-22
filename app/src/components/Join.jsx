@@ -1,6 +1,14 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
-  Fab, Grid, makeStyles, List, ListItem, ListItemIcon, ListItemText, Typography,
+  Fab,
+  Grid,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  makeStyles,
+  Typography,
 } from '@material-ui/core';
 import SearchIcon from '@material-ui/icons/Search';
 import GroupIcon from '@material-ui/icons/GroupOutlined';
@@ -87,10 +95,26 @@ function Join() {
               Join Twitter today.
             </Grid>
             <Grid item>
-              <Fab href="/signup" variant="extended" className={classes.button} color="primary">Sign Up</Fab>
+              <Fab
+                variant="extended"
+                className={classes.button}
+                color="primary"
+                component={Link}
+                to="/signup"
+              >
+                Sign Up
+              </Fab>
             </Grid>
             <Grid item>
-              <Fab href="/login" variant="extended" className={classes.outlineButton} color="primary">Log In</Fab>
+              <Fab
+                variant="extended"
+                className={classes.outlineButton}
+                color="primary"
+                component={Link}
+                to="/login"
+              >
+                Log In
+              </Fab>
             </Grid>
           </Grid>
         </Grid>
