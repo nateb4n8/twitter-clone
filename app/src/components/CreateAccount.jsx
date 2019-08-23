@@ -11,31 +11,10 @@ import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import FilledInput from '@material-ui/core/FilledInput';
 import { makeStyles, useTheme } from '@material-ui/styles';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 
-
-const months = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];
-const years = [];
-for (let i = 0; i < 120; i += 1) {
-  years.push(2019 - i);
-}
-const days = [];
-for (let i = 1; i < 32; i += 1) {
-  days.push(i);
-}
-
+import { fetchJoin } from '../utils/api';
 
 const useStyles = makeStyles({
   dialog: {
@@ -61,13 +40,11 @@ const useStyles = makeStyles({
 });
 
 function TextInput(props) {
-  const { label, onChange } = props;
   return (
     <TextField
+      {...props}
       variant="filled"
-      name={label.toLowerCase()}
       fullWidth
-      label={label}
       InputLabelProps={{
         shrink: true,
       }}
@@ -75,100 +52,136 @@ function TextInput(props) {
   );
 }
 
-function SimpleSelect(props) {
-  const { children, name, label } = props;
+function SimpleSelect({ name, label, ...rest }) {
   return (
     <FormControl variant="filled" fullWidth>
       <InputLabel htmlFor={name} shrink>{label}</InputLabel>
       <Select
-        // name={name}
         native
-        value=""
         input={<FilledInput name={name} id={name} />}
-      >
-        {children}
-      </Select>
+        {...rest}
+      />
     </FormControl>
   );
 }
 
-
 function CreateAccount() {
-  const [token, setToken] = React.useState();
+  const [submitting, setSubmitting] = React.useState(false);
+
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const paperProps = fullScreen ? {} : { className: classes.paper };
 
+  const handleSubmit = async ({ name, email, password }) => {
+    setSubmitting(true);
+    const res = await fetchJoin({ name, email, password })
+      .catch((err) => {
+        console.error(err);
+        return null;
+      });
+    console.log(res);
+
+    setSubmitting(false);
+  };
+
   return (
-    <Dialog
-      open
-      fullWidth
-      maxWidth="sm"
-      fullScreen={fullScreen}
-      className={classes.dialog}
-      PaperProps={paperProps}
+    <Formik
+      initialValues={{ name: '', email: '', password: '', confirmPassword: '' }}
+      onSubmit={handleSubmit}
+      validationSchema={Yup.object().shape({
+        name: Yup.string().min(1).max(30).required('REQUIRED'),
+        email: Yup.string().email().required('REQUIRED'),
+        password: Yup.string().matches(/^[a-zA-Z0-9]{3,30}$/).required('Required'),
+        confirmPassword: Yup.string().matches(/^[a-zA-Z0-9]{3,30}$/).required('Required'),
+      })}
     >
-      <DialogContent className={classes.content}>
-        <Grid container justify="space-between">
-          <Grid item>
-            <Typography className={classes.bold}>Step 1 of 5</Typography>
-          </Grid>
-          <Grid item>
-            <Fab
-              name="submit"
-              variant="extended"
-              size="small"
-              color="primary"
+      {(props) => {
+        const { values, errors, touched, isValid } = props;
+        const { handleChange, handleBlur, handleSubmit } = props;
+        const { password, confirmPassword } = values;
+
+        return (
+          <form>
+            <Dialog
+              open
+              fullWidth
+              maxWidth="sm"
+              fullScreen={fullScreen}
+              className={classes.dialog}
+              PaperProps={paperProps}
             >
-              <Typography className={classes.next}>
-                Submit
-              </Typography>
-            </Fab>
-          </Grid>
-        </Grid>
-        <Grid container spacing={4} direction="column" alignItems="stretch" className={classes.form}>
-          <Grid item>
-            <Typography className={classes.bold} variant="h6">Create your account</Typography>
-          </Grid>
-          <Grid item>
-            <TextInput label="Name" />
-          </Grid>
-          <Grid item>
-            <TextInput label="Phone" />
-          </Grid>
-          <Grid item>
-            <TextInput label="Email" />
-          </Grid>
-          <Grid item>
-            Date of birth
-          </Grid>
-          <Grid item>
-            <Grid container spacing={2}>
-              <Grid item xs={5}>
-                <SimpleSelect name="birth-month" label="Month">
-                  <option value="" />
-                  { months.map((month, index) => <option value={`${index}`} key={month}>{month}</option>)}
-                </SimpleSelect>
-              </Grid>
-              <Grid item xs={3}>
-                <SimpleSelect name="birth-day" label="Day">
-                  <option value="" />
-                  { days.map(day => <option value={`${day}`} key={day}>{day}</option>)}
-                </SimpleSelect>
-              </Grid>
-              <Grid item xs={4}>
-                <SimpleSelect name="birth-year" label="Year">
-                  <option value="" />
-                  { years.map(year => <option value={`${year}`} key={year}>{year}</option>)}
-                </SimpleSelect>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-      </DialogContent>
-    </Dialog>
+              <DialogContent className={classes.content}>
+                <Grid container spacing={4} direction="column" alignItems="stretch" className={classes.form}>
+                  {submitting && <h1>SUBMITTING</h1>}
+                  <Grid item>
+                    <Typography className={classes.bold} variant="h6">Create your account</Typography>
+                  </Grid>
+                  <Grid item>
+                    <TextInput
+                      type="text"
+                      name="name"
+                      label="Name"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={Boolean(errors.name && touched.name)}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextInput
+                      type="email"
+                      name="email"
+                      label="Email"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={Boolean(errors.email && touched.email)}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextInput
+                      type="password"
+                      name="password"
+                      label="Password"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={Boolean(errors.password && touched.password)}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextInput
+                      type="password"
+                      name="confirmPassword"
+                      label="Confirm Password"
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={Boolean(
+                        touched.confirmPassword
+                        && (password !== confirmPassword || errors.confirmPassword),
+                      )}
+                    />
+                  </Grid>
+                </Grid>
+                <Grid container justify="center">
+                  <Grid item>
+                    <Fab
+                      name="submit"
+                      variant="extended"
+                      size="small"
+                      color="primary"
+                      onClick={handleSubmit}
+                      disabled={!isValid || password !== confirmPassword}
+                    >
+                      <Typography className={classes.next}>Submit</Typography>
+                    </Fab>
+                  </Grid>
+                </Grid>
+              </DialogContent>
+            </Dialog>
+          </form>
+        );
+      }}
+    </Formik>
   );
 }
 

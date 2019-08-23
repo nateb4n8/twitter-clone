@@ -1,4 +1,5 @@
 const express = require('express');
+const cors = require('cors');
 
 const { port } = require('./startup/config');
 const winston = require('./startup/logger');
@@ -11,6 +12,7 @@ attachDB(app);
 
 app.use(express.json());
 
+app.use(cors());
 app.use(routes);
 
 const server = app.listen(
