@@ -7,7 +7,7 @@ const { jwtSecret } = require('../../startup/config');
 const schema = Joi.object({
   name: Joi.string().min(1).max(30).required(),
   email: Joi.string().email({ minDomainSegments: 2 }).required(),
-  password: Joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required(),
+  password: Joi.string().regex(/^[a-zA-Z0-9]{5,30}$/).required(),
 }).required();
 
 function validateUser(user) {

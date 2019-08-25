@@ -3,20 +3,21 @@ const { MongoClient } = require('mongodb');
 
 const { mongo: { user, password } } = require('./config');
 
-const url = 'mongodb://localhost:27017';
-const opts = {
-  useNewUrlParser: true,
-  auth: { user, password }
-};
 
 
-function decorate(app) {
-  MongoClient.connect(url, opts, (err, newClient) => {
-    if (err) return winston.error('Unable to connect to DB');
-
-    winston.info('Connected to DB');
-    app.locals.db = newClient.db('twitter');
-  });
+async function main() {
+  const url = 'mongodb://localhost:27017/admin';
+  const opts = {
+    useNewUrlParser: true,
+    auth: { user, password }
+  };
+  const client = new MongoClient(url, opts);
+  await client.connect()
+    .catch(err => winston.error('Unable to connect to DB: ', err));
+  
+  if (client.isConnected()) winston.info('Connected to DB');
+  
+  return client;
 }
 
-module.exports = decorate;
+module.exports = main;
