@@ -1,18 +1,16 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Fab from '@material-ui/core/Fab';
 import TextField from '@material-ui/core/TextField';
-import Select from '@material-ui/core/Select';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Dialog from '@material-ui/core/Dialog';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import DialogContent from '@material-ui/core/DialogContent';
-import FormControl from '@material-ui/core/FormControl';
-import InputLabel from '@material-ui/core/InputLabel';
-import FilledInput from '@material-ui/core/FilledInput';
 import { makeStyles, useTheme } from '@material-ui/styles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import { withRouter } from 'react-router-dom';
 
 import { fetchJoin } from '../utils/api';
 
@@ -52,21 +50,9 @@ function TextInput(props) {
   );
 }
 
-function SimpleSelect({ name, label, ...rest }) {
-  return (
-    <FormControl variant="filled" fullWidth>
-      <InputLabel htmlFor={name} shrink>{label}</InputLabel>
-      <Select
-        native
-        input={<FilledInput name={name} id={name} />}
-        {...rest}
-      />
-    </FormControl>
-  );
-}
-
-function CreateAccount() {
+function CreateAccount(props) {
   const [submitting, setSubmitting] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState(null);
 
   const classes = useStyles();
   const theme = useTheme();
@@ -76,12 +62,13 @@ function CreateAccount() {
 
   const handleSubmit = async ({ name, email, password }) => {
     setSubmitting(true);
+    setSubmitError(null);
+
     const res = await fetchJoin({ name, email, password })
-      .catch((err) => {
-        console.error(err);
-        return null;
-      });
-    console.log(res);
+      .catch(err => setSubmitError(err.message));
+
+
+    if (res) return props.history.push('/profile');
 
     setSubmitting(false);
   };
@@ -117,6 +104,9 @@ function CreateAccount() {
                   {submitting && <h1>SUBMITTING</h1>}
                   <Grid item>
                     <Typography className={classes.bold} variant="h6">Create your account</Typography>
+                  </Grid>
+                  <Grid item>
+                    <Typography className={classes.bold} variant="h6">{submitError}</Typography>
                   </Grid>
                   <Grid item>
                     <TextInput
@@ -185,4 +175,8 @@ function CreateAccount() {
   );
 }
 
-export default CreateAccount;
+CreateAccount.propTypes = {
+  history: PropTypes.object.isRequired,
+};
+
+export default withRouter(CreateAccount);

@@ -7,7 +7,7 @@ import {
 
 import AppTheme from './AppTheme';
 // import EditProfile from './EditProfile';
-// import Profile from './Profile';
+import Profile from './Profile';
 // import ComposeTweet from './ComposeTweet';
 // import Main from './Main';
 import Join from './Join';
@@ -37,6 +37,7 @@ function App() {
           <Route path="/" exact component={Join} />
           <Route path="/signup" component={CreateAccount} />
           <Route path="/login" component={Login} />
+          <Route path="/profile" render={props => <Profile {...props} {...profileProps} />} />
         </Switch>
       </Router>
     </AppTheme>

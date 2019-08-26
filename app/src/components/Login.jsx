@@ -1,10 +1,14 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
 import TextField from '@material-ui/core/TextField';
 import Fab from '@material-ui/core/Fab';
 import Typography from '@material-ui/core/Typography';
+import { withRouter } from 'react-router-dom';
+
+import { fetchLogin } from '../utils/api';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -14,17 +18,11 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function TextInput(props) {
-  const {
-    label, type, autoFocus,
-  } = props;
   return (
     <TextField
+      {...props}
       variant="filled"
-      name={label.toLowerCase()}
       fullWidth
-      label={label}
-      type={type}
-      autoFocus={autoFocus}
       InputLabelProps={{
         shrink: true,
       }}
@@ -32,8 +30,25 @@ function TextInput(props) {
   );
 }
 
-function Join() {
+function Login(props) {
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+  const [error, setError] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
   const classes = useStyles();
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    setLoading(true);
+    setError(null);
+
+    const res = await fetchLogin({ email, password })
+      .catch(e => setError(e.message));
+
+    if (res) props.history.push('/profile');
+    else setLoading(false);
+  };
 
   return (
     <Container maxWidth="sm">
@@ -41,11 +56,29 @@ function Join() {
         <Grid item>
           <Typography align="center" variant="h5">Log in to Twitter</Typography>
         </Grid>
+
+        {loading && <Grid item><Typography>Logging in</Typography></Grid>}
+
         <Grid item>
-          <TextInput label="Email" type="email" autoFocus />
+          <TextInput
+            type="email"
+            name="email"
+            label="Email"
+            onChange={e => setEmail(e.target.value)}
+            // onBlur={handleBlur}
+            // error={Boolean(errors.email && touched.email)}
+          />
         </Grid>
         <Grid item>
-          <TextInput label="Password" type="password" />
+          <TextInput
+            type="password"
+            name="password"
+            label="Password"
+            onChange={e => setPassword(e.target.value)}
+            // onBlur={handleBlur}
+            // error={Boolean(errors.password && touched.password)}
+          />
+          {/* <TextInput label="Password" type="password" onChange={e => setPassword(e.target.value)} /> */}
         </Grid>
         <Grid item>
           <Fab
@@ -53,13 +86,21 @@ function Join() {
             color="primary"
             className={classes.button}
             href="/login"
+            onClick={handleSubmit}
           >
             Log in
           </Fab>
         </Grid>
+
+        {error && <Grid item><Typography>{error}</Typography></Grid>}
+
       </Grid>
     </Container>
   );
 }
 
-export default Join;
+Login.propTypes = {
+  history: PropTypes.object.isRequired,
+};
+
+export default withRouter(Login);

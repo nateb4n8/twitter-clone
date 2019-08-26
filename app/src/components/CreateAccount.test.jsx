@@ -5,6 +5,7 @@ import Enzyme, { shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
 import { createMount } from '@material-ui/core/test-utils';
+import { MemoryRouter } from 'react-router-dom';
 
 import CreateAccount from './CreateAccount';
 import AppTheme from './AppTheme';
@@ -19,7 +20,13 @@ describe('<CreateAccount />', () => {
     sinon.stub(console, 'error');
 
     muiMount = createMount();
-    mount = elem => muiMount(shallow(<AppTheme>{elem}</AppTheme>).get(0));
+    mount = component => muiMount(
+      shallow(
+        <MemoryRouter>
+          <AppTheme>{component}</AppTheme>
+        </MemoryRouter>,
+      ).get(0),
+    );
   });
 
   afterEach(() => {

@@ -5,6 +5,7 @@ import Enzyme from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import sinon from 'sinon';
 import { createMount } from '@material-ui/core/test-utils';
+import { MemoryRouter } from 'react-router-dom';
 
 import Login from './Login';
 
@@ -12,10 +13,12 @@ Enzyme.configure({ adapter: new Adapter() });
 
 describe('<Login />', () => {
   let mount;
+  let mounter;
 
   beforeEach(() => {
     sinon.stub(console, 'error');
     mount = createMount();
+    mounter = component => mount(<MemoryRouter>{component}</MemoryRouter>);
   });
 
   afterEach(() => {
@@ -24,11 +27,11 @@ describe('<Login />', () => {
   });
 
   it('renders without crashing', () => {
-    mount(<Login />);
+    mounter(<Login />);
   });
 
   it('renders with an email text input', () => {
-    const wrapper = mount(<Login />);
+    const wrapper = mounter(<Login />);
 
     const emailInput = wrapper
       .find('input')
@@ -38,7 +41,7 @@ describe('<Login />', () => {
   });
 
   it('renders with a password text input', () => {
-    const wrapper = mount(<Login />);
+    const wrapper = mounter(<Login />);
 
     const passwordInput = wrapper
       .find('input')
@@ -48,7 +51,7 @@ describe('<Login />', () => {
   });
 
   it('renders with a Log in link', () => {
-    const wrapper = mount(<Login />);
+    const wrapper = mounter(<Login />);
 
     const loginAnchor = wrapper
       .find('a')
