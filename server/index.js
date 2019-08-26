@@ -11,7 +11,11 @@ async function main() {
   const app = express();
   
   app.use(express.json());
-  app.use(cors());
+  app.use(cors({ 
+    credentials: true,
+    origin: ['http://localhost:3000', 'http://localhost:3001']
+  }));
+  
   app.use(cookieParser());
 
   const client = await getDbClient();
