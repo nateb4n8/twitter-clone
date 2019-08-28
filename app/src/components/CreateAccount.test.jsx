@@ -9,6 +9,7 @@ import { MemoryRouter } from 'react-router-dom';
 
 import CreateAccount from './CreateAccount';
 import AppTheme from './AppTheme';
+import Auth from './AuthContext';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -20,11 +21,14 @@ describe('<CreateAccount />', () => {
     sinon.stub(console, 'error');
 
     muiMount = createMount();
+
     mount = component => muiMount(
       shallow(
-        <MemoryRouter>
-          <AppTheme>{component}</AppTheme>
-        </MemoryRouter>,
+        <Auth>
+          <MemoryRouter>
+            <AppTheme>{component}</AppTheme>
+          </MemoryRouter>
+        </Auth>,
       ).get(0),
     );
   });

@@ -6,6 +6,10 @@ import {
 import LocationIcon from '@material-ui/icons/Place';
 import JoinDateIcon from '@material-ui/icons/DateRange';
 
+import { fetchProfile } from '../utils/api';
+import EditProfile from './EditProfile';
+import ProfileProvider from './ProfileContext';
+
 const useStyles = makeStyles(theme => ({
   profileImage: {
     position: 'absolute',
@@ -19,6 +23,7 @@ const useStyles = makeStyles(theme => ({
     borderWidth: 10,
     borderStyle: 'solid',
     '& img': {
+      width: '100%',
       maxWidth: '100%',
       height: 'auto',
     },
@@ -38,33 +43,61 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function Profile(props) {
-  const {
-    primaryImageSrc,
-    profileName,
-    handle,
-    location,
-    joinDate,
-    followerAmt,
-    followingAmt,
-  } = props;
+function Profile() {
   const classes = useStyles();
+  const [profileImageSrc, setProfileImageSrc] = React.useState('');
+  const [profileName, setProfileName] = React.useState('');
+  const [handle, setHandle] = React.useState('');
+  const [location, setLocation] = React.useState('');
+  const [followerAmt, setFollowerAmt] = React.useState(0);
+  const [followingAmt, setFollowingAmt] = React.useState(0);
+  const [joinDate, setJoinDate] = React.useState('');
+  const [editOpen, setEditOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    fetchProfile()
+      .then((profile) => {
+        setProfileImageSrc(profile.profileImageSrc);
+        setProfileName(profile.name);
+        setHandle(profile.handle);
+        setLocation(profile.location);
+        setFollowerAmt(profile.followerCount);
+        setFollowingAmt(profile.followingCount);
+        setJoinDate(profile.joinDate);
+      });
+  }, []);
 
   const outputHandle = `@${handle}`;
   const outputFollowing = `${followingAmt} Following`;
   const outputFollowers = `${followerAmt} Followers`;
-  const outputJoinedDate = `Joined ${joinDate}`;
+
+  const dateString = new Date(joinDate).toLocaleDateString('en-US', {
+    month: 'long',
+    year: 'numeric',
+  });
+
+  const outputJoinedDate = `Joined ${dateString}`;
 
   return (
     <div style={{ backgroundColor: '#555' }}>
       <div className={classes.header}>
         <div className={classes.headerBanner} />
         <Grid container justify="flex-end" spacing={1}>
-          <Button name="editProfile" variant="outlined" color="primary">Edit profile</Button>
+          <Button
+            name="editProfile"
+            variant="outlined"
+            color="primary"
+            onClick={() => setEditOpen(true)}
+          >
+            Edit profile
+          </Button>
+          <ProfileProvider>
+            <EditProfile open={editOpen} onClose={() => setEditOpen(false)} />
+          </ProfileProvider>
         </Grid>
       </div>
       <div className={classes.profileImage}>
-        <img src={primaryImageSrc} alt={`${profileName} profile`} />
+        <img src={profileImageSrc} alt={`${profileName} profile`} />
       </div>
       <Grid container direction="column">
         <Grid item>
@@ -73,13 +106,13 @@ function Profile(props) {
         <Grid item>
           <Typography variant="body1" component="span">{outputHandle}</Typography>
         </Grid>
-        <Grid item container alignItems="center">
-          <LocationIcon fontSize="small" />
-          <Typography variant="body1" component="span" className={classes.marginRight}>
-            {location}
-          </Typography>
-          <JoinDateIcon fontSize="small" />
-          <Typography variant="body1" component="span">{outputJoinedDate}</Typography>
+        <Grid item>
+          <Grid container alignItems="center">
+            {location && <LocationIcon fontSize="small" /> }
+            {location && <Typography variant="body1" component="span" className={classes.marginRight}>{location}</Typography>}
+            {joinDate && <JoinDateIcon fontSize="small" />}
+            {joinDate && <Typography variant="body1" component="span">{outputJoinedDate}</Typography>}
+          </Grid>
         </Grid>
         <Grid item>
           <Typography variant="body1" component="span" className={classes.marginRight}>
@@ -91,15 +124,5 @@ function Profile(props) {
     </div>
   );
 }
-
-Profile.propTypes = {
-  primaryImageSrc: PropTypes.string.isRequired,
-  profileName: PropTypes.string.isRequired,
-  handle: PropTypes.string.isRequired,
-  location: PropTypes.string.isRequired,
-  joinDate: PropTypes.string.isRequired,
-  followingAmt: PropTypes.number.isRequired,
-  followerAmt: PropTypes.number.isRequired,
-};
 
 export default Profile;

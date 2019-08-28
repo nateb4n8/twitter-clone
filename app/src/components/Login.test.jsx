@@ -11,7 +11,7 @@ import Login from './Login';
 
 Enzyme.configure({ adapter: new Adapter() });
 
-describe('<Login />', () => {
+describe.skip('<Login />', () => {
   let mount;
   let mounter;
 

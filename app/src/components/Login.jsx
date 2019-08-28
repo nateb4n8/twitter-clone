@@ -9,6 +9,7 @@ import Typography from '@material-ui/core/Typography';
 import { withRouter } from 'react-router-dom';
 
 import { fetchLogin } from '../utils/api';
+import { authContext } from './AuthContext';
 
 const useStyles = makeStyles(theme => ({
   button: {
@@ -31,10 +32,13 @@ function TextInput(props) {
 }
 
 function Login(props) {
+  const { setAuthN } = React.useContext(authContext);
+
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
+
   const classes = useStyles();
 
   const handleSubmit = async (event) => {
@@ -46,8 +50,11 @@ function Login(props) {
     const res = await fetchLogin({ email, password })
       .catch(e => setError(e.message));
 
-    if (res) props.history.push('/profile');
-    else setLoading(false);
+    setLoading(false);
+
+    if (res) {
+      setAuthN(true);
+    }
   };
 
   return (

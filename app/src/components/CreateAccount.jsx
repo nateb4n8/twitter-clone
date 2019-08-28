@@ -11,6 +11,7 @@ import { makeStyles, useTheme } from '@material-ui/styles';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
 import { withRouter } from 'react-router-dom';
+import { authContext } from './AuthContext';
 
 import { fetchJoin } from '../utils/api';
 
@@ -54,6 +55,8 @@ function CreateAccount(props) {
   const [submitting, setSubmitting] = React.useState(false);
   const [submitError, setSubmitError] = React.useState(null);
 
+  const { isAuthenticated, setAuthN } = React.useContext(authContext);
+
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -67,8 +70,10 @@ function CreateAccount(props) {
     const res = await fetchJoin({ name, email, password })
       .catch(err => setSubmitError(err.message));
 
-
-    if (res) return props.history.push('/profile');
+    if (res) {
+      setAuthN(true);
+      return props.history.push('/profile');
+    }
 
     setSubmitting(false);
   };

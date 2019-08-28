@@ -3,6 +3,7 @@ import {
   BrowserRouter as Router,
   Route,
   Switch,
+  Redirect,
 } from 'react-router-dom';
 
 import AppTheme from './AppTheme';
@@ -13,8 +14,9 @@ import Profile from './Profile';
 import Join from './Join';
 import CreateAccount from './CreateAccount';
 import Login from './Login';
-
-// import AuthContext from './AuthContext';
+import Auth, { authContext } from './AuthContext';
+import AuthRoute from './AuthRoute';
+import PublicRoute from './PublicRoute';
 
 const profileProps = {
   primaryImageSrc: 'https://www.nathanacosta.com/static/media/nathan.3950ec4b.jpg',
@@ -28,19 +30,18 @@ const profileProps = {
 
 function App() {
   return (
-    <AppTheme>
-      {/* <Profile {...profileProps} /> */}
-      {/* <CreateAccount /> */}
-
-      <Router>
-        <Switch>
-          <Route path="/" exact component={Join} />
-          <Route path="/signup" component={CreateAccount} />
-          <Route path="/login" component={Login} />
-          <Route path="/profile" render={props => <Profile {...props} {...profileProps} />} />
-        </Switch>
-      </Router>
-    </AppTheme>
+    <Auth>
+      <AppTheme>
+        <Router>
+          <Switch>
+            <Route path="/" exact component={Join} />
+            <PublicRoute path="/signup" component={CreateAccount} />
+            <PublicRoute path="/login" component={Login} />
+            <AuthRoute path="/profile" component={() => <Profile {...profileProps} />} />
+          </Switch>
+        </Router>
+      </AppTheme>
+    </Auth>
   );
 }
 

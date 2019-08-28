@@ -12,6 +12,9 @@ import { makeStyles, useTheme } from '@material-ui/styles';
 import CloseIcon from '@material-ui/icons/Close';
 import CameraIcon from '@material-ui/icons/CameraAltOutlined';
 import DefaultProfileImage from '../images/default-profile.svg';
+import { profileContext } from './ProfileContext';
+import { fetchUpdateProfile } from '../utils/api';
+
 
 const useStyles = makeStyles(theme => ({
   dialog: {
@@ -31,12 +34,14 @@ const useStyles = makeStyles(theme => ({
     padding: '0px 8px',
   },
   profileImage: ({ src }) => ({
+    margin: 0,
     width: 100,
     height: 100,
     overflow: 'hidden',
     borderColor: 'rgba(0,0,0,0)',
     borderRadius: '50%',
     borderStyle: 'solid',
+    borderWidth: 0,
     background: `center grey / cover no-repeat url("${src}")`,
     '& button': {
       color: '#fff',
@@ -58,6 +63,7 @@ function TextInput({ label, onChange, value = '', max = 10 }) {
         fullWidth
         label={label}
         value={value}
+        onChange={e => onChange(e.target.value)}
         placeholder={`Add your ${label.toLowerCase()}`}
         InputLabelProps={{
           shrink: true,
@@ -70,33 +76,58 @@ function TextInput({ label, onChange, value = '', max = 10 }) {
   );
 }
 
-function EditProfile(props) {
-  const { primaryImageSrc } = props;
-  const classes = useStyles({
-    src: primaryImageSrc || DefaultProfileImage,
-  });
+function EditProfile({ open, onClose }) {
+  const profile = React.useContext(profileContext);
+
   const theme = useTheme();
+  const classes = useStyles({ src: profile.profileImageSrc || DefaultProfileImage });
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const paperProps = fullScreen ? {} : { className: classes.paper };
 
-  const name = 'Nathan Acosta';
+  const [nextName, setNextName] = React.useState('');
+  const [nextHandle, setNextHandle] = React.useState('');
+  const [nextLocation, setNextLocation] = React.useState('');
+  const [error, setError] = React.useState(null);
+
+  React.useEffect(() => {
+    setNextName(profile.name);
+    setNextHandle(profile.handle);
+    setNextLocation(profile.location);
+  }, [profile]);
+
+  const handleSave = () => {
+    fetchUpdateProfile({
+      name: nextName,
+      handle: nextHandle,
+      email: profile.email,
+      location: nextLocation,
+    })
+      .then(onClose)
+      .catch(setError);
+  };
+
   const bio = '';
-  const location = 'New Mexico';
   const website = '';
 
   return (
     <Dialog
-      open
+      open={open}
       fullWidth
       maxWidth="sm"
       fullScreen={fullScreen}
       className={classes.dialog}
       PaperProps={paperProps}
+      onClose={onClose}
     >
       <DialogContent className={classes.content}>
         <Grid container justify="space-between">
           <Grid item>
-            <IconButton name="close" color="primary" size="small">
+            <IconButton
+              name="close"
+              color="primary"
+              size="small"
+              onClick={onClose}
+            >
               <CloseIcon />
             </IconButton>
           </Grid>
@@ -107,7 +138,7 @@ function EditProfile(props) {
               size="small"
               color="primary"
             >
-              <Typography className={classes.save}>Save</Typography>
+              <Typography className={classes.save} onClick={handleSave}>Save</Typography>
             </Fab>
           </Grid>
         </Grid>
@@ -120,13 +151,13 @@ function EditProfile(props) {
         </div>
         <Grid container direction="column" spacing={3}>
           <Grid item>
-            <TextInput label="Name" value={name} max={50} onChange={() => null} />
+            <TextInput label="Name" value={nextName} max={50} onChange={setNextName} />
           </Grid>
           <Grid item>
-            <TextInput label="Bio" value={bio} max={160} onChange={() => null} />
+            <TextInput label="Handle" value={nextHandle} max={160} onChange={setNextHandle} />
           </Grid>
           <Grid item>
-            <TextInput label="Location" value={location} max={30} onChange={() => null} />
+            <TextInput label="Location" value={nextLocation} max={30} onChange={setNextLocation} />
           </Grid>
           <Grid item>
             <TextInput label="Website" value={website} max={100} onChange={() => null} />
@@ -138,11 +169,13 @@ function EditProfile(props) {
 }
 
 EditProfile.defaultProps = {
-  primaryImageSrc: '',
+  open: false,
+  onClose: () => {},
 };
 
 EditProfile.propTypes = {
-  primaryImageSrc: PropTypes.string,
+  open: PropTypes.bool,
+  onClose: PropTypes.func,
 };
 
 export default EditProfile;
