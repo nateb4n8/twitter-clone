@@ -23,7 +23,7 @@ const signup = async (req, res) => {
   
   user._id = id;
   const token = user.generateAuthToken();
-  res.cookie('sid', token, { maxAge: 15000, httpOnly: true });
+  res.cookie('sid', token, { maxAge: 3*60*1000, httpOnly: true });
   res.status(201).send('ok');
 };
 
@@ -51,7 +51,7 @@ const signin = async (req, res) => {
 
   user = new User(user);
   const token = user.generateAuthToken();
-  res.cookie('sid', token, { maxAge: 15000, httpOnly: true });
+  res.cookie('sid', token, { maxAge: 15*60*1000, httpOnly: true });
   res.send('ok');
 };
 
