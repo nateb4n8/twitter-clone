@@ -68,6 +68,21 @@ export async function fetchUpdateProfile(profile) {
   }
 }
 
+export async function fetchUpdateProfileImage(image) {
+  const formData = new FormData();
+  formData.append('image', image);
+
+  const res = await fetch(`${apiHost}/profile/`, {
+    method: 'PUT',
+    credentials: 'include',
+    body: formData,
+  });
+
+  if (res.status !== 200) {
+    throw new Error('Unable to update profile image');
+  }
+}
+
 export function main() {
   return null;
 }

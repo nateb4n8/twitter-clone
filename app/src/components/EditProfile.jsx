@@ -13,7 +13,7 @@ import CloseIcon from '@material-ui/icons/Close';
 import CameraIcon from '@material-ui/icons/CameraAltOutlined';
 import DefaultProfileImage from '../images/default-profile.svg';
 import { profileContext } from './ProfileContext';
-import { fetchUpdateProfile } from '../utils/api';
+import { fetchUpdateProfile, fetchUpdateProfileImage } from '../utils/api';
 
 
 const useStyles = makeStyles(theme => ({
@@ -51,6 +51,9 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(1),
     background: 'linear-gradient(blueviolet 50%, transparent 50%)',
   },
+  hidden: {
+    display: 'none',
+  },
 }));
 
 
@@ -77,37 +80,64 @@ function TextInput({ label, onChange, value = '', max = 10 }) {
 }
 
 function EditProfile({ open, onClose }) {
-  const profile = React.useContext(profileContext);
+  const { profile, refreshProfileImage } = React.useContext(profileContext);
 
-  const theme = useTheme();
-  const classes = useStyles({ src: profile.profileImageSrc || DefaultProfileImage });
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
-  const paperProps = fullScreen ? {} : { className: classes.paper };
 
+  const [profileImageSrc, setProfileImageSrc] = React.useState(DefaultProfileImage);
+  const [profileImageFile, setProfileImageFile] = React.useState(null);
   const [nextName, setNextName] = React.useState('');
   const [nextHandle, setNextHandle] = React.useState('');
   const [nextLocation, setNextLocation] = React.useState('');
   const [error, setError] = React.useState(null);
 
+  const theme = useTheme();
+  const classes = useStyles({ src: profileImageSrc });
+  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const paperProps = fullScreen ? {} : { className: classes.paper };
+
   React.useEffect(() => {
     setNextName(profile.name);
     setNextHandle(profile.handle);
     setNextLocation(profile.location);
+    setProfileImageSrc(profile.profileImageSrc);
   }, [profile]);
 
-  const handleSave = () => {
-    fetchUpdateProfile({
+  const handleSave = async () => {
+    const nextProfile = {
       name: nextName,
       handle: nextHandle,
       email: profile.email,
       location: nextLocation,
-    })
-      .then(onClose)
+    };
+    await fetchUpdateProfile(nextProfile)
       .catch(setError);
+    if (error) return console.error(error);
+
+    if (profileImageFile) {
+      await fetchUpdateProfileImage(profileImageFile)
+        .catch(setError);
+    }
+
+    if (error) return console.error(error);
+
+    refreshProfileImage();
+
+    onClose();
   };
 
-  const bio = '';
   const website = '';
+
+  const handleImageChange = (e) => {
+    const { files } = e.target;
+    if (files && files[0]) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setProfileImageSrc(event.target.result);
+        setProfileImageFile(files[0]);
+      };
+      reader.readAsDataURL(files[0]);
+    }
+  };
 
   return (
     <Dialog
@@ -144,9 +174,18 @@ function EditProfile({ open, onClose }) {
         </Grid>
         <div className={classes.header}>
           <Grid container justify="center" alignItems="center" className={classes.profileImage}>
-            <IconButton name="editProfileImage" size="small">
-              <CameraIcon />
-            </IconButton>
+            <input
+              accept="image/*"
+              className={classes.hidden}
+              id="icon-button-file"
+              type="file"
+              onChange={handleImageChange}
+            />
+            <label htmlFor="icon-button-file">
+              <IconButton name="editProfileImage" component="span" size="small">
+                <CameraIcon />
+              </IconButton>
+            </label>
           </Grid>
         </div>
         <Grid container direction="column" spacing={3}>

@@ -1,14 +1,13 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+// import PropTypes from 'prop-types';
 import {
   makeStyles, Typography, Button, Grid,
 } from '@material-ui/core';
 import LocationIcon from '@material-ui/icons/Place';
 import JoinDateIcon from '@material-ui/icons/DateRange';
 
-import { fetchProfile } from '../utils/api';
 import EditProfile from './EditProfile';
-import ProfileProvider from './ProfileContext';
+import { profileContext } from './ProfileContext';
 
 const useStyles = makeStyles(theme => ({
   profileImage: {
@@ -44,7 +43,8 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Profile() {
-  const classes = useStyles();
+  const { profile } = React.useContext(profileContext);
+
   const [profileImageSrc, setProfileImageSrc] = React.useState('');
   const [profileName, setProfileName] = React.useState('');
   const [handle, setHandle] = React.useState('');
@@ -53,19 +53,17 @@ function Profile() {
   const [followingAmt, setFollowingAmt] = React.useState(0);
   const [joinDate, setJoinDate] = React.useState('');
   const [editOpen, setEditOpen] = React.useState(false);
+  const classes = useStyles();
 
   React.useEffect(() => {
-    fetchProfile()
-      .then((profile) => {
-        setProfileImageSrc(profile.profileImageSrc);
-        setProfileName(profile.name);
-        setHandle(profile.handle);
-        setLocation(profile.location);
-        setFollowerAmt(profile.followerCount);
-        setFollowingAmt(profile.followingCount);
-        setJoinDate(profile.joinDate);
-      });
-  }, []);
+    setProfileName(profile.name);
+    setHandle(profile.handle);
+    setLocation(profile.location);
+    setProfileImageSrc(profile.profileImageSrc);
+    setFollowerAmt(profile.followerCount);
+    setFollowingAmt(profile.followingCount);
+    setJoinDate(profile.joinDate);
+  }, [profile]);
 
   const outputHandle = `@${handle}`;
   const outputFollowing = `${followingAmt} Following`;
@@ -91,9 +89,7 @@ function Profile() {
           >
             Edit profile
           </Button>
-          <ProfileProvider>
-            <EditProfile open={editOpen} onClose={() => setEditOpen(false)} />
-          </ProfileProvider>
+          <EditProfile open={editOpen} onClose={() => setEditOpen(false)} />
         </Grid>
       </div>
       <div className={classes.profileImage}>

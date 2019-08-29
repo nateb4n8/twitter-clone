@@ -14,13 +14,29 @@ function Profile({ children }) {
   React.useEffect(() => {
     if (isAuthenticated) {
       fetchProfile()
-        .then(setProfile)
+        .then((p) => {
+          setProfile({
+            ...p,
+            profileImageSrc: `//localhost:3001/assets/profileImages/${p.handle}`,
+          });
+        })
         .catch(() => setProfile({}));
     }
   }, [isAuthenticated]);
 
+  const refreshProfileImage = () => {
+    const { profileImageSrc } = profile;
+    if (profileImageSrc) {
+      const src = `${profileImageSrc.split('?')[0]}?${new Date().getTime()}`;
+      setProfile({
+        ...profile,
+        profileImageSrc: src,
+      });
+    }
+  };
+
   return (
-    <Provider value={profile}>
+    <Provider value={{ profile, refreshProfileImage }}>
       {children}
     </Provider>
   );

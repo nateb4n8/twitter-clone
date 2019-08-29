@@ -55,7 +55,7 @@ function CreateAccount(props) {
   const [submitting, setSubmitting] = React.useState(false);
   const [submitError, setSubmitError] = React.useState(null);
 
-  const { isAuthenticated, setAuthN } = React.useContext(authContext);
+  const { setAuthN } = React.useContext(authContext);
 
   const classes = useStyles();
   const theme = useTheme();
