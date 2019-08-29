@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const fileUpload = require('express-fileupload');
 
 const { port } = require('./startup/config');
 const winston = require('./startup/logger');
@@ -10,6 +11,7 @@ const routes = require('./src/routers/index.router');
 async function main() {
   const app = express();
   
+  app.use(fileUpload());
   app.use(express.json());
   app.use(cors({ 
     credentials: true,

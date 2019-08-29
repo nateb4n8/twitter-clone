@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const Joi = require('@hapi/joi');
 const { ObjectId } = require('mongodb');
 const merge = require('lodash/merge');
+const Jimp = require('jimp');
 
 const { User, validate } = require('../models/user.model');
 const { validateProfile } = require('../models/profile.model');
@@ -43,50 +44,41 @@ async function updateProfile(req, res) {
   let user = await db.collection('users').findOne(filter);
   if (!user) return res.status(400).send('User not found');
   
-  const { error } = validateProfile(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  if (req.headers['content-type'].match('multipart/form-data')) {
+    winston.info('Image uploading...');
+
+    if (Object.keys(req.files).length == 0) {
+      return res.status(400).send('No files were uploaded.');
+    }
   
-  const updates = merge(user, req.body);
-  const { insertedId } = await db.collection('users').replaceOne(filter, updates);
+    let { image } = req.files;
+    let imgPath = `${process.cwd()}/assets/profileImages/${user.handle}.jpg`;
+    image.mv(imgPath, async (err) => {
+      if (err) return res.status(500).send(err);
+      
+      const img = await Jimp.read(imgPath)
+        .catch(e => {
+          winston.error(e);
+          res.status(400).send(e.message);
+          return null;
+        });
+      
+      if (img) {
+        img.resize(64,64).write(imgPath);
+        winston.info('Image uploaded successfuly');
+        res.send('ok');
+      }
+    });
   
-  res.status(200).send('ok');
-}
-
-const signin = async (req, res) => {
-  const { error } = validateCreds(req.body);
-  if (error) {
-    winston.error(error);
-    return res.status(400).send('Invalid email or password');
+  } else if (req.headers['content-type'] === 'application/json') {
+    const { error } = validateProfile(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+    
+    const updates = merge(user, req.body);
+    const { insertedId } = await db.collection('users').replaceOne(filter, updates);
+    
+    res.send('ok');
   }
-
-  const { email, password } = req.body;
-  const { db } = req.app.locals;
-  
-  let user = await db.collection('users').findOne({ email });
-  if (!user) {
-    winston.error('signin failed: email not found')
-    return res.status(400).send('Invalid email or password');
-  }
-
-  const validPassword = await bcrypt.compare(password, user.password);
-  if (!validPassword) {
-      winston.error('signing failed: invalid password')
-    return res.status(400).send('Invalid email or password');
-  }
-
-  user = new User(user);
-  const token = user.generateAuthToken();
-  res.cookie('sid', token, { maxAge: 3*60*1000, httpOnly: true });
-  res.send('ok');
-};
-
-function validateCreds(user) {
-  const schema = {
-    email: Joi.string().email({ minDomainSegments: 2 }).required(),
-    password: Joi.string().regex(/^[a-zA-Z0-9]{5,30}$/).required(),
-  };
-
-  return Joi.validate(user, schema);
 }
 
 module.exports = {
