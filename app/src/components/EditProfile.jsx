@@ -8,13 +8,22 @@ import Dialog from '@material-ui/core/Dialog';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import DialogContent from '@material-ui/core/DialogContent';
 import IconButton from '@material-ui/core/IconButton';
-import { makeStyles, useTheme } from '@material-ui/styles';
+import { makeStyles, useTheme, withStyles } from '@material-ui/styles';
 import CloseIcon from '@material-ui/icons/Close';
 import CameraIcon from '@material-ui/icons/CameraAltOutlined';
+import LinearProgress from '@material-ui/core/LinearProgress';
 import DefaultProfileImage from '../images/default-profile.svg';
 import { profileContext } from './ProfileContext';
-import { fetchUpdateProfile, fetchUpdateProfileImage } from '../utils/api';
+import { fetchUpdateProfile } from '../utils/api';
 
+const ThemedLinearProgress = withStyles(theme => ({
+  colorPrimary: {
+    backgroundColor: theme.palette.secondary.main,
+  },
+  barColorPrimary: {
+    backgroundColor: theme.palette.primary.main,
+  },
+}))(LinearProgress);
 
 const useStyles = makeStyles(theme => ({
   dialog: {
@@ -54,6 +63,12 @@ const useStyles = makeStyles(theme => ({
   hidden: {
     display: 'none',
   },
+  loadingRoot: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100%',
+  },
 }));
 
 
@@ -80,7 +95,7 @@ function TextInput({ label, onChange, value = '', max = 10 }) {
 }
 
 function EditProfile({ open, onClose }) {
-  const { profile, refreshProfileImage } = React.useContext(profileContext);
+  const { profile, setProfile } = React.useContext(profileContext);
 
 
   const [profileImageSrc, setProfileImageSrc] = React.useState(DefaultProfileImage);
@@ -89,6 +104,7 @@ function EditProfile({ open, onClose }) {
   const [nextHandle, setNextHandle] = React.useState('');
   const [nextLocation, setNextLocation] = React.useState('');
   const [error, setError] = React.useState(null);
+  const [loading, setLoading] = React.useState(false);
 
   const theme = useTheme();
   const classes = useStyles({ src: profileImageSrc });
@@ -103,24 +119,24 @@ function EditProfile({ open, onClose }) {
   }, [profile]);
 
   const handleSave = async () => {
-    const nextProfile = {
-      name: nextName,
-      handle: nextHandle,
-      email: profile.email,
-      location: nextLocation,
-    };
-    await fetchUpdateProfile(nextProfile)
-      .catch(setError);
-    if (error) return console.error(error);
+    const nextProfile = {};
+    if (nextName !== profile.name) nextProfile.name = nextName;
+    if (nextHandle !== profile.handle) nextProfile.handle = nextHandle;
+    if (nextLocation !== profile.location) nextProfile.location = nextLocation;
+    if (profileImageSrc !== profile.profileImageSrc) nextProfile.profileImage = profileImageFile;
 
-    if (profileImageFile) {
-      await fetchUpdateProfileImage(profileImageFile)
-        .catch(setError);
+    if (Object.keys(nextProfile).length > 0) {
+      setLoading(true);
+
+      nextProfile.name = nextName;
+      nextProfile.handle = nextHandle;
+
+      const res = await fetchUpdateProfile(nextProfile).catch(setError);
+      if (error) return console.error(error);
+
+      setLoading(false);
+      setProfile({ ...profile, ...res });
     }
-
-    if (error) return console.error(error);
-
-    refreshProfileImage();
 
     onClose();
   };
@@ -203,6 +219,12 @@ function EditProfile({ open, onClose }) {
           </Grid>
         </Grid>
       </DialogContent>
+
+      {loading && (
+        <div className={classes.loadingRoot}>
+          <ThemedLinearProgress />
+        </div>
+      )}
     </Dialog>
   );
 }

@@ -1,4 +1,5 @@
 const Joi = require('@hapi/joi');
+const Jimp = require('jimp');
 
 const schema = Joi.object({
   name: Joi.string().min(1).max(64).required(),
@@ -7,7 +8,10 @@ const schema = Joi.object({
   
   location: Joi.string().max(128).allow(''),
   website: Joi.string().max(128).allow(''),
-
+  profileImage: Joi.object({
+    data: Joi.string().min(1).required(),
+    mimetype: Joi.string().valid(Jimp.MIME_JPEG).required(),
+  }),
 }).required();
 
 function validate(user) {

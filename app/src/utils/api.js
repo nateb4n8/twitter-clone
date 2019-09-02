@@ -54,23 +54,10 @@ export async function fetchProfile() {
 }
 
 export async function fetchUpdateProfile(profile) {
-  const res = await fetch(`${apiHost}/profile/`, {
-    method: 'PUT',
-    credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(profile),
-  });
-
-  if (res.status !== 200) {
-    throw new Error('Unable to update profile');
-  }
-}
-
-export async function fetchUpdateProfileImage(image) {
   const formData = new FormData();
-  formData.append('image', image);
+  Object.entries(profile).forEach(([name, value]) => {
+    if (value) formData.append(name, value);
+  });
 
   const res = await fetch(`${apiHost}/profile/`, {
     method: 'PUT',
@@ -81,6 +68,9 @@ export async function fetchUpdateProfileImage(image) {
   if (res.status !== 200) {
     throw new Error('Unable to update profile image');
   }
+
+  const data = await res.json();
+  return data;
 }
 
 export function main() {
