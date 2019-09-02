@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const Joi = require('@hapi/joi');
 
 const { User, validate } = require('../models/user.model');
+const { cookieOptions } = require('../../startup/config');
 
 const signup = async (req, res) => {
   const { error } = validate(req.body);
@@ -23,7 +24,8 @@ const signup = async (req, res) => {
   
   user._id = id;
   const token = user.generateAuthToken();
-  res.cookie('sid', token, { maxAge: 3*60*1000, httpOnly: true });
+  res.cookie('sid', token, cookieOptions);
+  
   res.status(201).send('ok');
 };
 
@@ -45,13 +47,14 @@ const signin = async (req, res) => {
 
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) {
-      winston.error('signing failed: invalid password')
+    winston.error('signing failed: invalid password')
     return res.status(400).send('Invalid email or password');
   }
 
   user = new User(user);
   const token = user.generateAuthToken();
-  res.cookie('sid', token, { maxAge: 15*60*1000, httpOnly: true });
+  res.cookie('sid', token, cookieOptions);
+
   res.send('ok');
 };
 

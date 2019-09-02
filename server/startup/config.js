@@ -7,5 +7,8 @@ module.exports = {
     password: process.env.MONGO_PASSWORD,
   },
   jwtSecret: process.env.JWT_SECRET,
-  assetStore: '//localhost:3001/assets'
+  cookieOptions: {
+    maxAge: 24*60*60*1000,
+    httpOnly: true
+  }
 }
