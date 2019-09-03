@@ -1,10 +1,16 @@
 import React from 'react';
 // import PropTypes from 'prop-types';
 import {
-  makeStyles, Typography, Button, Grid,
+  makeStyles,
+  Typography,
+  Button,
+  Grid,
 } from '@material-ui/core';
-import LocationIcon from '@material-ui/icons/Place';
-import JoinDateIcon from '@material-ui/icons/DateRange';
+import {
+  Link as LinkIcon,
+  Place as LocationIcon,
+  DateRange as JoinDateIcon,
+} from '@material-ui/icons';
 
 import EditProfile from './EditProfile';
 import { profileContext } from './ProfileContext';
@@ -43,31 +49,24 @@ const useStyles = makeStyles(theme => ({
 }));
 
 function Profile() {
-  const { profile } = React.useContext(profileContext);
-
-  const [profileImageSrc, setProfileImageSrc] = React.useState('');
-  const [profileName, setProfileName] = React.useState('');
-  const [handle, setHandle] = React.useState('');
-  const [location, setLocation] = React.useState('');
-  const [followerAmt, setFollowerAmt] = React.useState(0);
-  const [followingAmt, setFollowingAmt] = React.useState(0);
-  const [joinDate, setJoinDate] = React.useState('');
   const [editOpen, setEditOpen] = React.useState(false);
   const classes = useStyles();
 
-  React.useEffect(() => {
-    setProfileName(profile.name);
-    setHandle(profile.handle);
-    setLocation(profile.location);
-    setProfileImageSrc(profile.profileImageSrc);
-    setFollowerAmt(profile.followerCount);
-    setFollowingAmt(profile.followingCount);
-    setJoinDate(profile.joinDate);
-  }, [profile]);
+  const { profile } = React.useContext(profileContext);
+
+  const {
+    name: profileName,
+    handle,
+    location,
+    followerCount,
+    followingCount,
+    profileImageSrc,
+    joinDate,
+  } = profile;
 
   const outputHandle = `@${handle}`;
-  const outputFollowing = `${followingAmt} Following`;
-  const outputFollowers = `${followerAmt} Followers`;
+  const outputFollowing = `${followingCount} Following`;
+  const outputFollowers = `${followerCount} Followers`;
 
   const dateString = new Date(joinDate).toLocaleDateString('en-US', {
     month: 'long',
@@ -75,6 +74,16 @@ function Profile() {
   });
 
   const outputJoinedDate = `Joined ${dateString}`;
+
+  const { website } = profile;
+  let websiteDisplayText = website;
+  if (website) {
+    // remove protocol if present
+    if (website.startsWith('http://')) websiteDisplayText = website.slice(7);
+    else if (website.startsWith('https://')) websiteDisplayText = website.slice(8);
+    // remove www if present
+    if (websiteDisplayText.startsWith('www')) websiteDisplayText = websiteDisplayText.slice(4);
+  }
 
   return (
     <div style={{ backgroundColor: '#555' }}>
@@ -104,10 +113,30 @@ function Profile() {
         </Grid>
         <Grid item>
           <Grid container alignItems="center">
-            {location && <LocationIcon fontSize="small" /> }
-            {location && <Typography variant="body1" component="span" className={classes.marginRight}>{location}</Typography>}
-            {joinDate && <JoinDateIcon fontSize="small" />}
-            {joinDate && <Typography variant="body1" component="span">{outputJoinedDate}</Typography>}
+            {location && (
+              <Grid item container alignItems="center">
+                <LocationIcon fontSize="small" />
+                <Typography variant="body1" component="span" className={classes.marginRight}>
+                  {location}
+                </Typography>
+              </Grid>
+            )}
+            {website && (
+              <Grid item container alignItems="center">
+                <LinkIcon fontSize="small" />
+                <Typography variant="body1" className={classes.marginRight} component="a" href={website} target="_blank">
+                  {websiteDisplayText}
+                </Typography>
+              </Grid>
+            )}
+            {joinDate && (
+              <Grid item container alignItems="center">
+                <JoinDateIcon fontSize="small" />
+                <Typography variant="body1" component="span">
+                  {outputJoinedDate}
+                </Typography>
+              </Grid>
+            )}
           </Grid>
         </Grid>
         <Grid item>

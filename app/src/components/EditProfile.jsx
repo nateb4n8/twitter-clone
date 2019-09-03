@@ -103,6 +103,8 @@ function EditProfile({ open, onClose }) {
   const [nextName, setNextName] = React.useState('');
   const [nextHandle, setNextHandle] = React.useState('');
   const [nextLocation, setNextLocation] = React.useState('');
+  const [nextWebsite, setNextWebsite] = React.useState('');
+
   const [error, setError] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
 
@@ -115,6 +117,7 @@ function EditProfile({ open, onClose }) {
     setNextName(profile.name);
     setNextHandle(profile.handle);
     setNextLocation(profile.location);
+    setNextWebsite(profile.website);
     setProfileImageSrc(profile.profileImageSrc);
   }, [profile]);
 
@@ -123,6 +126,7 @@ function EditProfile({ open, onClose }) {
     if (nextName !== profile.name) nextProfile.name = nextName;
     if (nextHandle !== profile.handle) nextProfile.handle = nextHandle;
     if (nextLocation !== profile.location) nextProfile.location = nextLocation;
+    if (nextWebsite !== profile.website) nextProfile.website = nextWebsite;
     if (profileImageSrc !== profile.profileImageSrc) nextProfile.profileImage = profileImageFile;
 
     if (Object.keys(nextProfile).length > 0) {
@@ -140,8 +144,6 @@ function EditProfile({ open, onClose }) {
 
     onClose();
   };
-
-  const website = '';
 
   const handleImageChange = (e) => {
     const { files } = e.target;
@@ -215,7 +217,7 @@ function EditProfile({ open, onClose }) {
             <TextInput label="Location" value={nextLocation} max={30} onChange={setNextLocation} />
           </Grid>
           <Grid item>
-            <TextInput label="Website" value={website} max={100} onChange={() => null} />
+            <TextInput label="Website" value={nextWebsite} max={128} onChange={setNextWebsite} />
           </Grid>
         </Grid>
       </DialogContent>

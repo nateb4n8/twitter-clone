@@ -1,7 +1,6 @@
 const winston = require('winston');
 const { ObjectId } = require('mongodb');
-const merge = require('lodash/merge');
-const { pick } = require('lodash');
+const { pick, merge } = require('lodash');
 const Jimp = require('jimp');
 const { validateProfile } = require('../models/profile.model');
 
@@ -10,6 +9,7 @@ function getUserResponse(userDoc) {
     'name',
     'handle',
     'location',
+    'website',
     'followingCount',
     'followerCount',
   ]);

@@ -14,7 +14,12 @@ function Profile({ children }) {
   React.useEffect(() => {
     if (isAuthenticated) {
       fetchProfile()
-        .then(setProfile)
+        .then((p) => {
+          setProfile({
+            ...p,
+            website: p.website ? p.website : '',
+          });
+        })
         .catch(() => setProfile({}));
     }
   }, [isAuthenticated]);
