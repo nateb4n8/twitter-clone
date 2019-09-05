@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const winston = require('winston');
 const { jwtSecret } = require('../../startup/config');
 
 module.exports = function verifyAuth({ blockOnAuth, requireToken }) {
@@ -11,7 +10,6 @@ module.exports = function verifyAuth({ blockOnAuth, requireToken }) {
       if (blockOnAuth) return res.send('Already signed in');
     } catch (error) {
       req.isAuthenticated = false;
-      winston.info('Bad cookie');
       
       if (requireToken) return res.status(401).send('Please sign in first');
     }
