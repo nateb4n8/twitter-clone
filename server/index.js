@@ -11,7 +11,11 @@ async function main() {
   middleware(app);
 
   const client = await getDbClient();
-  app.locals.db = client.db('twitter');
+  const db = await client.db('twitter');
+  app.locals.db = {
+    users: db.collection('users'),
+    collection: col => db.collection(col),
+  }
 
   app.use(routes);
 

@@ -19,7 +19,7 @@ winston.configure({
     myFormat,
   ),
   transports: [ new transports.Console() ]
-})
+});
 
 const middlewareLogger = expressWinston.logger({
   transports: [
