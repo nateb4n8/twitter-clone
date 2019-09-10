@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { fetchProfile } from '../utils/api';
+import { fetchCurrentProfile } from '../utils/api';
 import { authContext } from './AuthContext';
 
 const context = React.createContext();
@@ -13,7 +13,7 @@ function Profile({ children }) {
 
   React.useEffect(() => {
     if (isAuthenticated) {
-      fetchProfile()
+      fetchCurrentProfile()
         .then((p) => {
           setProfile({
             ...p,

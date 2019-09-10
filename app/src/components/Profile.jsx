@@ -14,6 +14,8 @@ import {
 
 import EditProfile from './EditProfile';
 import { profileContext } from './ProfileContext';
+import { fetchProfile } from '../utils/api';
+
 
 const useStyles = makeStyles(theme => ({
   profileImage: {
@@ -48,14 +50,26 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function Profile() {
+function Profile(props) {
   const [editOpen, setEditOpen] = React.useState(false);
+  const [profile, setProfile] = React.useState({});
   const classes = useStyles();
 
-  const { profile } = React.useContext(profileContext);
+  const { profile: currUserProfile } = React.useContext(profileContext);
+  const { handle: currUserHandle } = currUserProfile;
+
+  const { handle: pathHandle } = props.match.params;
+  const isCurrentUser = currUserHandle === pathHandle;
+
+  const profileHandle = isCurrentUser ? currUserHandle : pathHandle;
+  React.useEffect(() => {
+    fetchProfile(profileHandle)
+      .then(setProfile)
+      .catch(() => setProfile({}));
+  }, [profileHandle]);
 
   const {
-    name: profileName,
+    name,
     handle,
     location,
     followerCount,
@@ -89,24 +103,48 @@ function Profile() {
     <div style={{ backgroundColor: '#555' }}>
       <div className={classes.header}>
         <div className={classes.headerBanner} />
-        <Grid container justify="flex-end" spacing={1}>
-          <Button
-            name="editProfile"
-            variant="outlined"
-            color="primary"
-            onClick={() => setEditOpen(true)}
-          >
-            Edit profile
-          </Button>
-          <EditProfile open={editOpen} onClose={() => setEditOpen(false)} />
-        </Grid>
+        {
+          isCurrentUser === true
+            ? (
+              <Grid container justify="flex-end" spacing={1}>
+                <Button
+                  name="editProfile"
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => setEditOpen(true)}
+                >
+                Edit profile
+                </Button>
+                <EditProfile open={editOpen} onClose={() => setEditOpen(false)} />
+              </Grid>
+            ) : (
+              <Grid container justify="flex-end" spacing={1}>
+                <Button
+                  name=""
+                  variant="outlined"
+                  color="primary"
+                >
+                Share Link
+                </Button>
+                <Button
+                  name=""
+                  variant="outlined"
+                  color="primary"
+                >
+                Follow
+                </Button>
+              </Grid>
+            )
+        }
+
+
       </div>
       <div className={classes.profileImage}>
-        <img src={profileImageSrc} alt={`${profileName} profile`} />
+        <img src={profileImageSrc} alt={`${name} profile`} />
       </div>
       <Grid container direction="column">
         <Grid item>
-          <Typography component="h3" className={classes.profileName}>{profileName}</Typography>
+          <Typography component="h3" className={classes.profileName}>{name}</Typography>
         </Grid>
         <Grid item>
           <Typography variant="body1" component="span">{outputHandle}</Typography>

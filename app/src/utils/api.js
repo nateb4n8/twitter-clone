@@ -44,8 +44,17 @@ export async function fetchAuthN() {
   throw new Error(msg);
 }
 
-export async function fetchProfile() {
+export async function fetchCurrentProfile() {
   const res = await fetch(`${apiHost}/profile/`, { credentials: 'include' });
+
+  const profile = await res.json();
+  if (res.status === 200) return profile;
+
+  return {};
+}
+
+export async function fetchProfile(handle) {
+  const res = await fetch(`${apiHost}/${handle}`, { credentials: 'include' });
 
   const profile = await res.json();
   if (res.status === 200) return profile;

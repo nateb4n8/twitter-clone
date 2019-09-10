@@ -14,8 +14,11 @@ function getUserResponse(userDoc) {
     'followerCount',
   ]);
   result.joinDate = ObjectId(userDoc._id).getTimestamp();
-  const { mimetype, data } = userDoc.profileImage;
-  result.profileImageSrc = `data:${mimetype};base64,${data.toString('base64')}`;
+
+  if (userDoc.profileImage) {
+    const { mimetype, data } = userDoc.profileImage;
+    result.profileImageSrc = `data:${mimetype};base64,${data.toString('base64')}`;
+  }
 
   return result;
 }
@@ -23,12 +26,36 @@ function getUserResponse(userDoc) {
 async function getUser(req, res) {
   const { id } = req.token;
   const { db } = req.app.locals;
-  let user = await db.collection('users').findOne({ _id: ObjectId(id) });
+  let user;
+  try {
+    user = await db.collection('users').findOne({ _id: ObjectId(id) });
+  } catch (error) {
+    winston.error(error);
+    return res.sendStatus(500);
+  }
   
   if (user) {
     res.send(getUserResponse(user));
   } else {
-    res.status(500).send('');
+    res.status(404).send('user not found');
+  }
+}
+
+async function getUserByHandle(req, res) {
+  const { handle } = req.params;
+  const { db } = req.app.locals;
+  let user;
+  try {
+    user = await db.collection('users').findOne({ handle });
+  } catch (error) {
+    winston.error(error);
+    return res.sendStatus(500);
+  }
+  
+  if (user) {
+    res.send(getUserResponse(user));
+  } else {
+    res.status(404).send('user not found');
   }
 }
 
@@ -75,5 +102,6 @@ async function updateProfile(req, res) {
 
 module.exports = {
   getUser,
+  getUserByHandle,
   updateProfile,
 };
