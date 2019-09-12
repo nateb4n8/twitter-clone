@@ -13,19 +13,23 @@ import { authContext } from './AuthContext';
 import ProfileProvider from './ProfileContext';
 import AuthRoute from './AuthRoute';
 import PublicRoute from './PublicRoute';
+import Loading from './Loading';
+import Main from './Main';
 
 function Routes() {
-  const { isAuthenticated } = React.useContext(authContext);
+  const { isAuthenticated, authenticating } = React.useContext(authContext);
+
+  if (authenticating) return <Loading />;
 
   if (isAuthenticated) {
     return (
       <ProfileProvider>
         <Router>
           <Switch>
-            {/* <Route path="/" exact component={() => <h1>HOME</h1>} /> */}
-            {/* <AuthRoute path="/home" component={Profile} /> */}
-            {/* <AuthRoute path="/profile" component={Profile} /> */}
+            <Route path="/login" render={() => <Redirect to="/home" />} />
+            <AuthRoute path="/home" component={Main} />
             <AuthRoute path="/:handle" component={Profile} />
+            <Route path="/" render={() => <Redirect to="/home" />} />
           </Switch>
         </Router>
       </ProfileProvider>
@@ -38,7 +42,7 @@ function Routes() {
         <Route path="/" exact component={Join} />
         <PublicRoute path="/signup" component={CreateAccount} />
         <PublicRoute path="/login" component={Login} />
-        {/* <Route render={() => <Redirect to="/" />} /> */}
+        <Route render={() => <Redirect to="/" />} />
       </Switch>
     </Router>
   );
