@@ -8,13 +8,9 @@ const searchRoutes = require('./search.router');
 const router = express.Router();
 
 router.use('/', userRoutes);
-
 router.get('/health-check', (req, res) => res.send('ok'));
-
 router.use('/auth', authRoutes);
-// router.use('/profile', userRoutes);
 router.use('/search', searchRoutes);
-
 router.get('/assets/profileImages/:handle', (req, res) => {
   const { handle } = req.params;
 
@@ -29,6 +25,5 @@ router.get('/assets/profileImages/:handle', (req, res) => {
     }
   });
 }); 
-
 
 module.exports = router;

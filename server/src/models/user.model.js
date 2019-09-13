@@ -14,6 +14,8 @@ const schema = Joi.object({
   followingCount: Joi.number().min(0),
   followerCount: Joi.number().min(0),
   profileImageSrc: Joi.string().min(9),
+  followers: Joi.array().items(Joi.string().min(1).max(30)),
+  following: Joi.array().items(Joi.string().min(1).max(30)),
 }).required();
 
 function validateUser(user) {
@@ -31,6 +33,8 @@ class User {
     followingCount,
     followerCount,
     profileImageSrc,
+    followers,
+    following,
   }) {
     this._id = _id;
     this.name = name;
@@ -42,6 +46,8 @@ class User {
     this.followingCount = followingCount || 0;
     this.followerCount = followerCount || 0;
     this.profileImageSrc = profileImageSrc || `${assetStore}/profileImages/${this.handle}`;
+    this.followers = followers || [];
+    this.following = following || [];
   }
 
   generateAuthToken() {
@@ -49,7 +55,10 @@ class User {
       return winston.error('cannot make auth token with undefined id');
     }
 
-    const token = jwt.sign({ id: this._id }, jwtSecret);
+    const token = jwt.sign({ 
+      id: this._id,
+      handle: this.handle,
+    }, jwtSecret);
     return token;
   }
 }

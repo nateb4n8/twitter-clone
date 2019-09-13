@@ -3,6 +3,7 @@ const { ObjectId } = require('mongodb');
 const { pick, merge } = require('lodash');
 const Jimp = require('jimp');
 const { validateProfile } = require('../models/profile.model');
+const { User } = require('../models/user.model');
 
 function getUserResponse(userDoc) {
   const result = pick(userDoc, [
@@ -99,9 +100,62 @@ async function updateProfile(req, res) {
   return res.send(getUserResponse(doc.value));
 }
 
+// need to make this function a transaction
+async function follow(req, res) {
+  const { handle } = req.token;
+  const { handle: toFollow } = req.query;
+  const { db } = req.app.locals;
+
+  let currUser;
+  let followee;
+  try {
+    currUser = await db.collection('users').findOne({ handle });
+    followee = await db.collection('users').findOne({ handle: toFollow });
+  } catch (error) {
+    winston.error(error);
+    return res.sendStatus(500);
+  }
+  
+  if (!currUser) return res.status(400).send('handle not found');
+  if (!followee) return res.status(400).send('handle to follow not found');
+
+  currUser = new User(currUser);
+  followee = new User(followee);
+
+  let following = new Set(currUser.following);
+  let followers = new Set(followee.followers);
+  if (currUser.following.includes(toFollow)) {
+    // need to unfollow
+    following.delete(toFollow);
+    followers.delete(handle);
+  } else {
+    // need to follow
+    following.add(toFollow);
+    followers.add(handle);
+  }
+  following = [...following];
+  followers = [...followers];
+  
+  try {
+    await db.collection('users').findOneAndUpdate(
+      { handle },
+      { $set: { following } },
+    );
+    await db.collection('users').findOneAndUpdate(
+      { handle: toFollow },
+      { $set: { followers } },
+    );
+  } catch (error) {
+    winston.error(error);
+    return res.sendStatus(500);
+  }
+
+  res.send({ following });
+}
 
 module.exports = {
   getUser,
   getUserByHandle,
   updateProfile,
+  follow,
 };
