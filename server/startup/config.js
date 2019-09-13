@@ -10,5 +10,6 @@ module.exports = {
   cookieOptions: {
     maxAge: 24*60*60*1000,
     httpOnly: true
-  }
+  },
+  imageAssetsPath: `${process.cwd()}/assets/images/`,
 }

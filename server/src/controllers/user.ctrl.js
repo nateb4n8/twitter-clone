@@ -1,9 +1,12 @@
 const winston = require('winston');
+const fs = require('fs');
 const { ObjectId } = require('mongodb');
 const { pick, merge } = require('lodash');
 const Jimp = require('jimp');
 const { validateProfile } = require('../models/profile.model');
 const { User } = require('../models/user.model');
+const { imageAssetsPath } = require('../../startup/config');
+
 
 function getUserResponse(userDoc) {
   const result = pick(userDoc, [
@@ -60,6 +63,8 @@ async function getUserByHandle(req, res) {
   }
 }
 
+// TODO make this a transaction somehow to ensure images and profile data stay
+// synched
 async function updateProfile(req, res) {
   const { id } = req.token;
   const { db } = req.app.locals;
@@ -68,33 +73,62 @@ async function updateProfile(req, res) {
   if (error) return res.status(400).send(error.details[0].message);
   
   const filter = { _id: ObjectId(id) };
-  let user = await db.collection('users').findOne(filter);
+  let user = await db.collection('users')
+    .findOne(filter)
+    .catch(error => winston.error(error) || null);
   if (!user) return res.status(400).send('User not found');
 
   const userUpdates = merge(new Object(), user, req.body);
-  
-  if (req.files && req.files.profileImage) {
-    try {
-      const img = await Jimp.read(req.files.profileImage.data);
-      const buffer = await img.resize(256,256).getBufferAsync(Jimp.MIME_JPEG);
-      merge(userUpdates, {
-        profileImage: {
-          mimetype: Jimp.MIME_JPEG,
-          data: buffer,
-        }
-      });
-    } catch (error) {
-      winston.error(error);
-    }
-  }
+
   const doc = await db.collection('users').findOneAndReplace(
     filter, 
     userUpdates,
     { returnOriginal: false },
   );
-
   if (doc.value === null) {
     return res.status(500).send('An issue occurred during update.');
+  }
+
+  // rename profile images if handle has changed
+  if (user.handle !== userUpdates.handle) {
+    try {
+      fs.renameSync(
+        `${imageAssetsPath}${user.handle}.jpg`,
+        `${imageAssetsPath}${userUpdates.handle}.jpg`
+      );
+      fs.renameSync(
+        `${imageAssetsPath}${user.handle}-banner.jpg`,
+        `${imageAssetsPath}${userUpdates.handle}-banner.jpg`
+      );
+    } catch (error) {
+      winston.error(error);
+    }
+  }
+
+  if (req.files) {
+    const { profileImage, bannerImage } = req.files;
+    
+    if (profileImage) {
+      try {
+        const img = await Jimp.read(profileImage.data);
+        await img
+          .scaleToFit(256,256)
+          .write(`${imageAssetsPath}${userUpdates.handle}.jpg`);
+      } catch (error) {
+        winston.error(error);
+      }
+    }
+
+    if (bannerImage) {
+      try {
+        const bannerImg = await Jimp.read(req.files.bannerImage.data);
+        await bannerImg
+          .scaleToFit(1920,1080)
+          .write(`${imageAssetsPath}${userUpdates.handle}-banner.jpg`);
+      } catch (error) {
+        winston.error(error);
+      }  
+    }
   }
 
   return res.send(getUserResponse(doc.value));
