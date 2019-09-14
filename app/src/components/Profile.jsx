@@ -3,70 +3,80 @@ import PropTypes from 'prop-types';
 import {
   makeStyles,
   Typography,
-  Button,
   Grid,
+  Fab,
 } from '@material-ui/core';
 import {
   Link as LinkIcon,
   Place as LocationIcon,
   DateRange as JoinDateIcon,
+  Edit as EditIcon,
+  Share as ShareIcon,
+  PersonAdd as PersonAddIcon,
 } from '@material-ui/icons';
-
 import EditProfile from './EditProfile';
 import { profileContext } from './ProfileContext';
 import { fetchProfile } from '../utils/api';
 
 
-const useStyles = makeStyles(theme => ({
-  profileImage: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: 120,
-    height: 120,
-    overflow: 'hidden',
-    borderColor: 'rgba(0,0,0,0)',
-    borderRadius: '50%',
-    borderWidth: 10,
-    borderStyle: 'solid',
-    backgroundColor: 'grey',
-    '& img': {
-      width: '100%',
-      maxWidth: '100%',
-      height: 'auto',
+const useStyles = makeStyles((theme) => {
+  const imgHeight = 120;
+  const borderWidth = theme.spacing(1);
+
+  return {
+    marginRight: {
+      marginRight: theme.spacing(2),
     },
-  },
-  marginRight: {
-    marginRight: theme.spacing(2),
-  },
-  profileName: {
-    fontWeight: 600,
-  },
-  header: {
-    height: 140,
-  },
-  headerBanner: {
-    height: 70,
-    backgroundColor: theme.palette.primary.main,
-  },
-}));
+    profileName: {
+      fontWeight: 600,
+    },
+    backgroundBanner: {
+      width: '100%',
+      height: 160,
+      background: ({ bannerImg }) => `center / cover no-repeat url(${bannerImg})`,
+    },
+    profImg: {
+      marginTop: -(imgHeight / 2 + borderWidth + theme.spacing(2)),
+      borderWidth,
+      width: imgHeight,
+      height: imgHeight,
+      overflow: 'hidden',
+      borderColor: 'rgba(0,0,0,0)',
+      borderRadius: '50%',
+      borderStyle: 'solid',
+      backgroundColor: 'grey',
+    },
+  };
+});
 
 function ProfileNotFound({ unknownHandle }) {
-  const classes = useStyles();
+  const classes = useStyles({
+    bannerImg: `//localhost:3001/assets/bannerImage/${unknownHandle}`,
+  });
   return (
-    <div style={{ backgroundColor: '#555' }}>
-      <div className={classes.header}>
-        <div className={classes.headerBanner} />
+    <div>
+      <div className={classes.backgroundBanner} />
+      <div style={{ padding: 16 }}>
+        <Grid container spacing={2}>
+          <Grid item>
+            <Grid container direction="column">
+              <Grid item>
+                <img
+                  src={`//localhost:3001/assets/profileImage/${unknownHandle}`}
+                  alt="profile not found"
+                  className={classes.profImg}
+                />
+              </Grid>
+              <Grid item>
+                <Typography variant="body1" component="span">{`@${unknownHandle}`}</Typography>
+              </Grid>
+              <Grid item>
+                <Typography align="center" variant="body1">This account does not exist</Typography>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
       </div>
-      <div className={classes.profileImage} />
-      <Grid container direction="column">
-        <Grid item>
-          <Typography variant="body1" component="span">{`@${unknownHandle}`}</Typography>
-        </Grid>
-        <Grid item>
-          <Typography align="center" variant="body1">This account does not exist</Typography>
-        </Grid>
-      </Grid>
     </div>
   );
 }
@@ -78,7 +88,9 @@ function Profile({ match }) {
   const [editOpen, setEditOpen] = React.useState(false);
   const [profile, setProfile] = React.useState({});
   const [handleNotFound, setHandleNotFound] = React.useState(false);
-  const classes = useStyles();
+  const classes = useStyles({
+    bannerImg: `//localhost:3001/assets/bannerImage/${profile.handle}`,
+  });
 
   const { profile: currUserProfile } = React.useContext(profileContext);
   const { handle: currUserHandle } = currUserProfile;
@@ -99,7 +111,6 @@ function Profile({ match }) {
     location,
     followerCount,
     followingCount,
-    profileImageSrc,
     joinDate,
   } = profile;
 
@@ -134,15 +145,15 @@ function Profile({ match }) {
 
   if (isCurrentUser) {
     profileMenu = (
-      <Grid container justify="flex-end" spacing={1}>
-        <Button
+      <Grid container justify="flex-end">
+        <Fab
           name="editProfile"
-          variant="outlined"
+          aria-label="edit profile"
           color="primary"
           onClick={() => setEditOpen(true)}
         >
-        Edit profile
-        </Button>
+          <EditIcon />
+        </Fab>
         <EditProfile open={editOpen} onClose={() => setEditOpen(false)} />
       </Grid>
     );
@@ -150,81 +161,95 @@ function Profile({ match }) {
   else {
     profileMenu = (
       <Grid container justify="flex-end" spacing={1}>
-        <Button
-          name=""
-          variant="outlined"
-          color="primary"
-        >
-        Share Link
-        </Button>
-        <Button
-          name=""
-          variant="outlined"
-          color="primary"
-        >
-        Follow
-        </Button>
+        <Grid item>
+          <Fab
+            name=""
+            aria-label="follow user"
+            color="primary"
+          >
+            <PersonAddIcon />
+          </Fab>
+        </Grid>
+        <Grid item>
+          <Fab
+            name=""
+            aria-label="share user"
+            color="primary"
+          >
+            <ShareIcon />
+          </Fab>
+        </Grid>
       </Grid>
     );
   }
 
   return (
-    <div style={{ backgroundColor: '#555' }}>
-      <div className={classes.header}>
-        <div className={classes.headerBanner} />
-        { profileMenu }
-      </div>
-      <div className={classes.profileImage}>
-        {profileImageSrc && <img src={profileImageSrc} alt={`${name} profile`} />}
-      </div>
-      <Grid container direction="column">
-        <Grid item>
-          <Typography component="h3" className={classes.profileName}>{name}</Typography>
-        </Grid>
-        <Grid item>
-          <Typography variant="body1" component="span">{`@${handle}`}</Typography>
-        </Grid>
-        <Grid item>
-          <Grid container alignItems="center">
-            {location && (
-              <Grid item container alignItems="center">
-                <LocationIcon fontSize="small" />
+    <div>
+      <div className={classes.backgroundBanner} />
+      <div style={{ padding: 16 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={9}>
+            <Grid container direction="column">
+              <Grid item>
+                <img
+                  src={`//localhost:3001/assets/profileImage/${handle}`}
+                  alt={`${name} profile`}
+                  className={classes.profImg}
+                />
+              </Grid>
+              <Grid item>
+                <Typography component="h3" className={classes.profileName}>{name}</Typography>
+              </Grid>
+              <Grid item>
+                <Typography variant="body1" component="span">{`@${handle}`}</Typography>
+              </Grid>
+              <Grid item>
+                <Grid container alignItems="center">
+                  {location && (
+                  <Grid item container alignItems="center">
+                    <LocationIcon fontSize="small" />
+                    <Typography variant="body1" component="span" className={classes.marginRight}>
+                      {location}
+                    </Typography>
+                  </Grid>
+                  )}
+                  {website && (
+                  <Grid item container alignItems="center">
+                    <LinkIcon fontSize="small" />
+                    <Typography
+                      variant="body1"
+                      className={classes.marginRight}
+                      component="a"
+                      href={website}
+                      target="_blank"
+                    >
+                      {websiteDisplayText}
+                    </Typography>
+                  </Grid>
+                  )}
+                  <Grid item container alignItems="center">
+                    <JoinDateIcon fontSize="small" />
+                    <Typography variant="body1" component="span">
+                      {outputJoinedDate}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </Grid>
+              <Grid item>
                 <Typography variant="body1" component="span" className={classes.marginRight}>
-                  {location}
+                  {`${followingCount} Following`}
+                </Typography>
+                <Typography variant="body1" component="span">
+                  {`${followerCount} Followers`}
                 </Typography>
               </Grid>
-            )}
-            {website && (
-              <Grid item container alignItems="center">
-                <LinkIcon fontSize="small" />
-                <Typography
-                  variant="body1"
-                  className={classes.marginRight}
-                  component="a"
-                  href={website}
-                  target="_blank"
-                >
-                  {websiteDisplayText}
-                </Typography>
-              </Grid>
-            )}
-            <Grid item container alignItems="center">
-              <JoinDateIcon fontSize="small" />
-              <Typography variant="body1" component="span">
-                {outputJoinedDate}
-              </Typography>
             </Grid>
           </Grid>
+          <Grid item xs={3}>
+            {profileMenu}
+          </Grid>
         </Grid>
-        <Grid item>
-          <Typography variant="body1" component="span" className={classes.marginRight}>
-            {`${followingCount} Following`}
-          </Typography>
-          <Typography variant="body1" component="span">
-            {`${followerCount} Followers`}
-          </Typography>
-        </Grid>
-      </Grid>
+      </div>
     </div>
   );
 }

@@ -25,51 +25,77 @@ const ThemedLinearProgress = withStyles(theme => ({
   },
 }))(LinearProgress);
 
-const useStyles = makeStyles(theme => ({
-  dialog: {
-    borderRadius: '50%',
-  },
-  form: {
-    padding: 30,
-  },
-  content: {
-    padding: 12,
-  },
-  paper: {
-    borderRadius: 12,
-  },
-  save: {
-    textTransform: 'none',
-    padding: '0px 8px',
-  },
-  profileImage: ({ src }) => ({
-    margin: 0,
-    width: 100,
-    height: 100,
-    overflow: 'hidden',
-    borderColor: 'rgba(0,0,0,0)',
-    borderRadius: '50%',
-    borderStyle: 'solid',
-    borderWidth: 0,
-    background: `center grey / cover no-repeat url("${src}")`,
-    '& button': {
-      color: '#fff',
+const useStyles = makeStyles((theme) => {
+  const imgHeight = 120;
+  const borderWidth = 0; // theme.spacing(1);
+
+  return {
+    dialog: {
+      borderRadius: '50%',
     },
-  }),
-  header: {
-    padding: theme.spacing(1),
-    background: 'linear-gradient(blueviolet 50%, transparent 50%)',
-  },
-  hidden: {
-    display: 'none',
-  },
-  loadingRoot: {
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-  },
-}));
+    form: {
+      padding: 30,
+    },
+    content: {
+      padding: 12,
+    },
+    paper: {
+      borderRadius: 12,
+    },
+    save: {
+      textTransform: 'none',
+      padding: '0px 8px',
+    },
+    profileImage: ({ src }) => ({
+      margin: 0,
+      width: 100,
+      height: 100,
+      overflow: 'hidden',
+      borderColor: 'rgba(0,0,0,0)',
+      borderRadius: '50%',
+      borderStyle: 'solid',
+      borderWidth: 0,
+      background: `center grey / cover no-repeat url("${src}")`,
+      '& button': {
+        color: '#fff',
+      },
+    }),
+    header: {
+      padding: theme.spacing(1),
+      background: 'linear-gradient(blueviolet 50%, transparent 50%)',
+    },
+    hidden: {
+      display: 'none',
+    },
+    loadingRoot: {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      width: '100%',
+    },
+
+    // NEW NEW NEW
+    backgroundBanner: {
+      width: '100%',
+      height: 160,
+      background: ({ bannerImg }) => `center / cover no-repeat url(${bannerImg})`,
+    },
+    profImg: {
+      marginTop: -(imgHeight / 2 + borderWidth + theme.spacing(2)),
+      borderWidth,
+      width: imgHeight,
+      height: imgHeight,
+      overflow: 'hidden',
+      borderColor: 'rgba(0,0,0,0)',
+      borderRadius: '50%',
+      borderStyle: 'solid',
+      background: ({ src }) => `center grey / cover no-repeat url(${src})`,
+      '& button': {
+        color: '#fff',
+      },
+    },
+  };
+});
 
 
 function TextInput({ label, onChange, value = '', max = 10 }) {
@@ -98,7 +124,7 @@ function EditProfile({ open, onClose }) {
   const { profile, setProfile } = React.useContext(profileContext);
 
 
-  const [profileImageSrc, setProfileImageSrc] = React.useState(DefaultProfileImage);
+  const [profileImageSrc, setProfileImageSrc] = React.useState('//localhost:3001/assets/profileImage/default');
   const [profileImageFile, setProfileImageFile] = React.useState(null);
   const [nextName, setNextName] = React.useState('');
   const [nextHandle, setNextHandle] = React.useState('');
@@ -109,7 +135,10 @@ function EditProfile({ open, onClose }) {
   const [loading, setLoading] = React.useState(false);
 
   const theme = useTheme();
-  const classes = useStyles({ src: profileImageSrc });
+  const classes = useStyles({
+    src: profileImageSrc,
+    bannerImg: `//localhost:3001/assets/bannerImage/${profile.handle}`,
+  });
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
   const paperProps = fullScreen ? {} : { className: classes.paper };
 
@@ -118,7 +147,7 @@ function EditProfile({ open, onClose }) {
     setNextHandle(profile.handle);
     setNextLocation(profile.location);
     setNextWebsite(profile.website);
-    setProfileImageSrc(profile.profileImageSrc);
+    setProfileImageSrc(`//localhost:3001/assets/profileImage/${profile.handle}`);
   }, [profile]);
 
   const handleSave = async () => {
@@ -190,21 +219,28 @@ function EditProfile({ open, onClose }) {
             </Fab>
           </Grid>
         </Grid>
-        <div className={classes.header}>
-          <Grid container justify="center" alignItems="center" className={classes.profileImage}>
-            <input
-              accept="image/*"
-              className={classes.hidden}
-              id="icon-button-file"
-              type="file"
-              onChange={handleImageChange}
-            />
-            <label htmlFor="icon-button-file">
-              <IconButton name="editProfileImage" component="span" size="small">
-                <CameraIcon />
-              </IconButton>
-            </label>
-          </Grid>
+        <div>
+          <div className={classes.backgroundBanner} />
+          <div style={{ padding: 16 }}>
+            <Grid container spacing={2}>
+              <Grid item>
+                <Grid container justify="center" alignItems="center" className={classes.profImg}>
+                  <input
+                    accept="image/*"
+                    className={classes.hidden}
+                    id="icon-button-file"
+                    type="file"
+                    onChange={handleImageChange}
+                  />
+                  <label htmlFor="icon-button-file">
+                    <IconButton name="editProfileImage" component="span" size="small">
+                      <CameraIcon />
+                    </IconButton>
+                  </label>
+                </Grid>
+              </Grid>
+            </Grid>
+          </div>
         </div>
         <Grid container direction="column" spacing={3}>
           <Grid item>
