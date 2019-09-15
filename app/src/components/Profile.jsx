@@ -15,9 +15,9 @@ import {
   PersonAdd as PersonAddIcon,
 } from '@material-ui/icons';
 import EditProfile from './EditProfile';
-import { profileContext } from './ProfileContext';
-import { fetchProfile } from '../utils/api';
-
+import { authContext } from './AuthContext';
+// import { fetchProfile } from '../utils/api';
+import { bannerImagePath, profileImagePath } from '../utils/config';
 
 const useStyles = makeStyles((theme) => {
   const imgHeight = 120;
@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => {
 
 function ProfileNotFound({ unknownHandle }) {
   const classes = useStyles({
-    bannerImg: `//localhost:3001/assets/bannerImage/${unknownHandle}`,
+    bannerImg: `${bannerImagePath}${unknownHandle}`,
   });
   return (
     <div>
@@ -62,7 +62,7 @@ function ProfileNotFound({ unknownHandle }) {
             <Grid container direction="column">
               <Grid item>
                 <img
-                  src={`//localhost:3001/assets/profileImage/${unknownHandle}`}
+                  src={`${profileImagePath}${unknownHandle}`}
                   alt="profile not found"
                   className={classes.profImg}
                 />
@@ -84,27 +84,7 @@ ProfileNotFound.propTypes = {
   unknownHandle: PropTypes.string.isRequired,
 };
 
-function Profile({ match }) {
-  const [editOpen, setEditOpen] = React.useState(false);
-  const [profile, setProfile] = React.useState({});
-  const [handleNotFound, setHandleNotFound] = React.useState(false);
-  const classes = useStyles({
-    bannerImg: `//localhost:3001/assets/bannerImage/${profile.handle}`,
-  });
-
-  const { profile: currUserProfile } = React.useContext(profileContext);
-  const { handle: currUserHandle } = currUserProfile;
-
-  const { handle: pathHandle } = match.params;
-  const isCurrentUser = currUserHandle === pathHandle;
-
-  const profileHandle = isCurrentUser ? currUserHandle : pathHandle;
-  React.useEffect(() => {
-    fetchProfile(profileHandle)
-      .then(setProfile)
-      .catch(() => setHandleNotFound(true));
-  }, [profileHandle]);
-
+function Profile(props) {
   const {
     name,
     handle,
@@ -112,7 +92,17 @@ function Profile({ match }) {
     followerCount,
     followingCount,
     joinDate,
-  } = profile;
+    isCurrentUser,
+    website,
+    handleNotFound,
+  } = props;
+
+  const [editOpen, setEditOpen] = React.useState(false);
+  const { profile: { profileImageId, bannerImageId } } = React.useContext(authContext);
+
+  const classes = useStyles({
+    bannerImg: `${bannerImagePath}${handle}?ts=${bannerImageId}`,
+  });
 
   const dateString = new Date(joinDate).toLocaleDateString('en-US', {
     month: 'long',
@@ -121,7 +111,6 @@ function Profile({ match }) {
 
   const outputJoinedDate = `Joined ${dateString}`;
 
-  const { website } = profile;
   let websiteDisplayText = website;
   if (website) {
     // remove protocol if present
@@ -140,7 +129,7 @@ function Profile({ match }) {
 
   let profileMenu;
   if (handleNotFound) {
-    return <ProfileNotFound unknownHandle={profileHandle} />;
+    return <ProfileNotFound unknownHandle={handle} />;
   }
 
   if (isCurrentUser) {
@@ -154,6 +143,7 @@ function Profile({ match }) {
         >
           <EditIcon />
         </Fab>
+        {/* { editOpen && } */}
         <EditProfile open={editOpen} onClose={() => setEditOpen(false)} />
       </Grid>
     );
@@ -192,7 +182,7 @@ function Profile({ match }) {
             <Grid container direction="column">
               <Grid item>
                 <img
-                  src={`//localhost:3001/assets/profileImage/${handle}`}
+                  src={`${profileImagePath}${handle}?ts=${profileImageId}`}
                   alt={`${name} profile`}
                   className={classes.profImg}
                 />
@@ -254,14 +244,8 @@ function Profile({ match }) {
   );
 }
 Profile.defaultProps = {
-  match: { params: { handle: '' } },
 };
 Profile.propTypes = {
-  match: PropTypes.shape({
-    params: PropTypes.shape({
-      handle: PropTypes.string,
-    }),
-  }),
 };
 
 export default Profile;

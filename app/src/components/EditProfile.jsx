@@ -12,9 +12,10 @@ import { makeStyles, useTheme, withStyles } from '@material-ui/styles';
 import CloseIcon from '@material-ui/icons/Close';
 import CameraIcon from '@material-ui/icons/CameraAltOutlined';
 import LinearProgress from '@material-ui/core/LinearProgress';
-import DefaultProfileImage from '../images/default-profile.svg';
-import { profileContext } from './ProfileContext';
+import _ from 'lodash';
+import { authContext } from './AuthContext';
 import { fetchUpdateProfile } from '../utils/api';
+import { bannerImagePath, profileImagePath } from '../utils/config';
 
 const ThemedLinearProgress = withStyles(theme => ({
   colorPrimary: {
@@ -121,15 +122,16 @@ function TextInput({ label, onChange, value = '', max = 10 }) {
 }
 
 function EditProfile({ open, onClose }) {
-  const { profile, setProfile } = React.useContext(profileContext);
+  const { profile, setProfile } = React.useContext(authContext);
 
-
-  const [profileImageSrc, setProfileImageSrc] = React.useState('//localhost:3001/assets/profileImage/default');
+  const [profileImageSrc, setProfileImageSrc] = React.useState(`${profileImagePath}${profile.handle}`);
   const [profileImageFile, setProfileImageFile] = React.useState(null);
-  const [nextName, setNextName] = React.useState('');
-  const [nextHandle, setNextHandle] = React.useState('');
-  const [nextLocation, setNextLocation] = React.useState('');
-  const [nextWebsite, setNextWebsite] = React.useState('');
+  const [bannerImageSrc, setBannerImageSrc] = React.useState(`${bannerImagePath}${profile.handle}`);
+  const [bannerImageFile, setBannerImageFile] = React.useState(null);
+  const [nextName, setNextName] = React.useState(profile.name);
+  const [nextHandle, setNextHandle] = React.useState(profile.handle);
+  const [nextLocation, setNextLocation] = React.useState(profile.location);
+  const [nextWebsite, setNextWebsite] = React.useState(profile.website);
 
   const [error, setError] = React.useState(null);
   const [loading, setLoading] = React.useState(false);
@@ -137,50 +139,79 @@ function EditProfile({ open, onClose }) {
   const theme = useTheme();
   const classes = useStyles({
     src: profileImageSrc,
-    bannerImg: `//localhost:3001/assets/bannerImage/${profile.handle}`,
+    bannerImg: bannerImageSrc,
   });
-  const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
   const paperProps = fullScreen ? {} : { className: classes.paper };
 
-  React.useEffect(() => {
+  const reset = () => {
     setNextName(profile.name);
     setNextHandle(profile.handle);
     setNextLocation(profile.location);
     setNextWebsite(profile.website);
-    setProfileImageSrc(`//localhost:3001/assets/profileImage/${profile.handle}`);
-  }, [profile]);
+    setProfileImageSrc(`${profileImagePath}${profile.handle}`);
+    setBannerImageSrc(`${bannerImagePath}${profile.handle}`);
+  };
 
   const handleSave = async () => {
-    const nextProfile = {};
-    if (nextName !== profile.name) nextProfile.name = nextName;
-    if (nextHandle !== profile.handle) nextProfile.handle = nextHandle;
-    if (nextLocation !== profile.location) nextProfile.location = nextLocation;
-    if (nextWebsite !== profile.website) nextProfile.website = nextWebsite;
-    if (profileImageSrc !== profile.profileImageSrc) nextProfile.profileImage = profileImageFile;
+    const nextProfile = {
+      ...profile,
+      name: nextName,
+      handle: nextHandle,
+      location: nextLocation,
+      website: nextWebsite,
+      portraitUrl: profileImageSrc,
+      bannerUrl: bannerImageSrc,
+    };
 
-    if (Object.keys(nextProfile).length > 0) {
+    if (_.isEqual(profile, nextProfile) === false) {
+      nextProfile.profileImage = profileImageFile;
+      nextProfile.bannerImage = bannerImageFile;
+
+      let payload = _.pick(nextProfile, [
+        'name', 'handle', 'location', 'website', 'profileImage', 'bannerImage',
+      ]);
+      payload = _.omitBy(payload, _.isNil);
+
       setLoading(true);
+      const res = await fetchUpdateProfile(payload).catch(setError);
+      setLoading(false);
 
-      nextProfile.name = nextName;
-      nextProfile.handle = nextHandle;
-
-      const res = await fetchUpdateProfile(nextProfile).catch(setError);
       if (error) return console.error(error);
 
-      setLoading(false);
-      setProfile({ ...profile, ...res });
+      let { profileImageId, bannerImageId } = profile;
+      if (profileImageFile) {
+        profileImageId = new Date().getTime();
+      }
+      if (bannerImageFile) {
+        bannerImageId = new Date().getTime();
+      }
+
+      setProfile({
+        ...profile,
+        ...res,
+        profileImageId,
+        bannerImageId,
+      });
     }
 
     onClose();
   };
 
   const handleImageChange = (e) => {
-    const { files } = e.target;
+    const { files, id } = e.target;
+
     if (files && files[0]) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        setProfileImageSrc(event.target.result);
-        setProfileImageFile(files[0]);
+        if (id === 'profile-image-edit-button') {
+          setProfileImageSrc(event.target.result);
+          setProfileImageFile(files[0]);
+        }
+        else if (id === 'banner-edit-button') {
+          setBannerImageSrc(event.target.result);
+          setBannerImageFile(files[0]);
+        }
       };
       reader.readAsDataURL(files[0]);
     }
@@ -195,6 +226,7 @@ function EditProfile({ open, onClose }) {
       className={classes.dialog}
       PaperProps={paperProps}
       onClose={onClose}
+      onExited={reset}
     >
       <DialogContent className={classes.content}>
         <Grid container justify="space-between">
@@ -220,7 +252,20 @@ function EditProfile({ open, onClose }) {
           </Grid>
         </Grid>
         <div>
-          <div className={classes.backgroundBanner} />
+          <Grid container justify="center" alignItems="center" className={classes.backgroundBanner}>
+            <input
+              accept="image/*"
+              className={classes.hidden}
+              id="banner-edit-button"
+              type="file"
+              onChange={handleImageChange}
+            />
+            <label htmlFor="banner-edit-button">
+              <IconButton name="editBannerImage" component="span" size="small">
+                <CameraIcon />
+              </IconButton>
+            </label>
+          </Grid>
           <div style={{ padding: 16 }}>
             <Grid container spacing={2}>
               <Grid item>
@@ -228,11 +273,11 @@ function EditProfile({ open, onClose }) {
                   <input
                     accept="image/*"
                     className={classes.hidden}
-                    id="icon-button-file"
+                    id="profile-image-edit-button"
                     type="file"
                     onChange={handleImageChange}
                   />
-                  <label htmlFor="icon-button-file">
+                  <label htmlFor="profile-image-edit-button">
                     <IconButton name="editProfileImage" component="span" size="small">
                       <CameraIcon />
                     </IconButton>
