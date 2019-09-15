@@ -1,4 +1,6 @@
-const apiHost = 'http://localhost:3001';
+import { bannerImagePath, profileImagePath } from './config';
+
+const apiHost = `http://${window.location.hostname}:3001`;
 
 export async function fetchJoin(newUserDetails) {
   const res = await fetch(`${apiHost}/auth/signup`, {
@@ -38,10 +40,13 @@ export async function fetchAuthN() {
     credentials: 'include',
   });
 
-  const msg = await res.text();
-  if (res.status === 200) return msg;
+  const data = await res.json();
+  data.portraitUrl = `${profileImagePath}${data.handle}`;
+  data.bannerUrl = `${bannerImagePath}${data.handle}`;
 
-  throw new Error(msg);
+  if (res.status === 200) return data;
+
+  throw new Error(data);
 }
 
 export async function fetchCurrentProfile() {
@@ -65,10 +70,12 @@ export async function fetchProfile(handle) {
 export async function fetchUpdateProfile(profile) {
   const formData = new FormData();
   Object.entries(profile).forEach(([name, value]) => {
-    if (value) formData.append(name, value);
+    if (typeof value !== 'undefined' || value !== null) {
+      formData.append(name, value);
+    }
   });
 
-  const res = await fetch(`${apiHost}/profile/`, {
+  const res = await fetch(`${apiHost}/`, {
     method: 'PUT',
     credentials: 'include',
     body: formData,
