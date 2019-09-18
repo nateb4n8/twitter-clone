@@ -14,6 +14,7 @@ async function main() {
   const db = await client.db('twitter');
   app.locals.db = {
     users: db.collection('users'),
+    tweets: db.collection('tweets'),
     collection: col => db.collection(col),
   }
 
