@@ -14,9 +14,6 @@ const schema = Joi.object({
   }),
 }).required();
 
-function validate(user) {
-  return Joi.validate(user, schema);
-}
 
 // exports.User = User;
-exports.validateProfile = validate;
+exports.validateProfile = schema.validate;

@@ -2,11 +2,11 @@ const winston = require('winston');
 const bcrypt = require('bcrypt');
 const Joi = require('@hapi/joi');
 
-const { User, validate } = require('../models/user.model');
+const { User, userSchema } = require('../models/user.model');
 const { cookieOptions } = require('../../startup/config');
 
 const signup = async (req, res) => {
-  const { error } = validate(req.body);
+  const { error } = userSchema.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
 
   const { email, name, password } = req.body;
@@ -59,12 +59,11 @@ const signin = async (req, res) => {
 };
 
 function validateCreds(user) {
-  const schema = {
+  const schema = Joi.object({
     email: Joi.string().email({ minDomainSegments: 2 }).required(),
     password: Joi.string().regex(/^[a-zA-Z0-9]{5,30}$/).required(),
-  };
-
-  return Joi.validate(user, schema);
+  });
+  return schema.validate(user);
 }
 
 module.exports = {

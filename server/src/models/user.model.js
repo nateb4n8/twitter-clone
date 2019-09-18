@@ -18,10 +18,6 @@ const schema = Joi.object({
   following: Joi.array().items(Joi.string().min(1).max(30)),
 }).required();
 
-function validateUser(user) {
-  return Joi.validate(user, schema);
-}
-
 class User {
   constructor({ 
     _id,
@@ -64,4 +60,4 @@ class User {
 }
 
 exports.User = User;
-exports.validate = validateUser;
+exports.userSchema = schema;
