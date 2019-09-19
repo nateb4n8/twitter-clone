@@ -12,10 +12,10 @@ export async function fetchJoin(newUserDetails) {
     credentials: 'include',
   });
 
-  const msg = await res.text();
-  if (res.status === 201) return msg;
+  const data = await res.json();
+  if (data.error) throw new Error(data.error);
 
-  throw new Error(msg);
+  return data;
 }
 
 export async function fetchLogin({ email, password }) {
@@ -28,10 +28,10 @@ export async function fetchLogin({ email, password }) {
     credentials: 'include',
   });
 
-  const msg = await res.text();
-  if (res.status === 200) return msg;
+  const data = await res.json();
+  if (res.status === 200) return data;
 
-  throw new Error(msg);
+  throw new Error(data.error);
 }
 
 export async function fetchAuthN() {
@@ -40,13 +40,16 @@ export async function fetchAuthN() {
     credentials: 'include',
   });
 
-  const data = await res.json();
-  data.portraitUrl = `${profileImagePath}${data.handle}`;
-  data.bannerUrl = `${bannerImagePath}${data.handle}`;
+  if (res.status === 200) {
+    const data = await res.json();
+    data.portraitUrl = `${profileImagePath}${data.handle}`;
+    data.bannerUrl = `${bannerImagePath}${data.handle}`;
 
-  if (res.status === 200) return data;
+    return data;
+  }
 
-  throw new Error(data);
+  const msg = await res.text();
+  throw new Error(msg);
 }
 
 export async function fetchCurrentProfile() {

@@ -51,11 +51,11 @@ function TextInput(props) {
   );
 }
 
-function CreateAccount(props) {
+function CreateAccount() {
   const [submitting, setSubmitting] = React.useState(false);
   const [submitError, setSubmitError] = React.useState(null);
 
-  const { setAuthN } = React.useContext(authContext);
+  const { setProfile } = React.useContext(authContext);
 
   const classes = useStyles();
   const theme = useTheme();
@@ -67,15 +67,14 @@ function CreateAccount(props) {
     setSubmitting(true);
     setSubmitError(null);
 
-    const res = await fetchJoin({ name, email, password })
+    const profile = await fetchJoin({ name, email, password })
       .catch(err => setSubmitError(err.message));
 
-    if (res) {
-      setAuthN(true);
-      return props.history.push('/profile');
-    }
-
     setSubmitting(false);
+
+    if (!submitError) {
+      setProfile(profile);
+    }
   };
 
   return (

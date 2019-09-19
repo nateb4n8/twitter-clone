@@ -11,34 +11,48 @@ import CreateAccount from './CreateAccount';
 import Login from './Login';
 import { authContext } from './AuthContext';
 import AuthRoute from './AuthRoute';
-import PublicRoute from './PublicRoute';
 import Loading from './Loading';
 import Main from './Main';
 
 function Routes() {
-  const { isAuthenticated, authenticating } = React.useContext(authContext);
+  const { isAuthenticated, authenticating, profile } = React.useContext(authContext);
 
   if (authenticating) return <Loading />;
-
-  if (isAuthenticated) {
-    return (
-      <Router>
-        <Switch>
-          <Route path="/login" render={() => <Redirect to="/home" />} />
-          <AuthRoute path="/home" component={Main} />
-          <AuthRoute path="/:handle" component={ProfileData} />
-          <Route path="/" render={() => <Redirect to="/home" />} />
-        </Switch>
-      </Router>
-    );
-  }
 
   return (
     <Router>
       <Switch>
-        <Route path="/" exact component={Join} />
-        <PublicRoute path="/signup" component={CreateAccount} />
-        <PublicRoute path="/login" component={Login} />
+        <Route
+          path="/signup"
+          render={() => (
+            isAuthenticated === true
+              ? <Redirect to={`/${profile.handle}`} />
+              : <CreateAccount />
+          )}
+        />
+
+        <Route
+          path="/login"
+          render={() => (
+            isAuthenticated === true
+              ? <Redirect to="/home" />
+              : <Login />
+          )}
+        />
+
+        <AuthRoute path="/home" component={Main} />
+        <AuthRoute path="/:handle" component={ProfileData} />
+
+        <Route
+          exact
+          path="/"
+          render={() => (
+            isAuthenticated === true
+              ? <Redirect to="/home" />
+              : <Join />
+          )}
+        />
+
         <Route render={() => <Redirect to="/" />} />
       </Switch>
     </Router>

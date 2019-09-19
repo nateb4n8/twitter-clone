@@ -32,7 +32,7 @@ function TextInput(props) {
 }
 
 function Login(props) {
-  const { setAuthN } = React.useContext(authContext);
+  const { setProfile } = React.useContext(authContext);
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -53,7 +53,7 @@ function Login(props) {
     setLoading(false);
 
     if (res) {
-      setAuthN(true);
+      setProfile(res);
     }
   };
 
