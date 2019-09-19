@@ -16,4 +16,4 @@ const schema = Joi.object({
 
 
 // exports.User = User;
-exports.validateProfile = schema.validate;
+exports.profileSchema = schema

@@ -3,7 +3,7 @@ const fs = require('fs');
 const { ObjectId } = require('mongodb');
 const { pick, merge } = require('lodash');
 const Jimp = require('jimp');
-const { validateProfile } = require('../models/profile.model');
+const { profileSchema } = require('../models/profile.model');
 const { User } = require('../models/user.model');
 const { imageAssetsPath } = require('../../startup/config');
 
@@ -69,7 +69,7 @@ async function updateProfile(req, res) {
   const { id } = req.token;
   const { db } = req.app.locals;
 
-  const { error } = validateProfile(req.body);
+  const { error } = profileSchema.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   
   const filter = { _id: ObjectId(id) };
