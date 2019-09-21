@@ -1,8 +1,6 @@
 const winston = require('winston');
 const { ObjectId } = require('mongodb');
-const { pick, merge } = require('lodash');
 const { Tweet, tweetSchema} = require('../models/tweet.model');
-// const { imageAssetsPath } = require('../../startup/config');
 
 
 async function createTweet(req, res) {
@@ -48,6 +46,7 @@ async function getTweetsByUser(req, res) {
   }
   
   if (tweets) {
+    tweets = tweets.map(({ _id: id, ...rest }) => ({ id, ...rest }));
     res.send({ tweets });
   } else {
     res.status(404).send('User not found');

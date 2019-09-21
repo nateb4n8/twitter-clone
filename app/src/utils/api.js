@@ -92,6 +92,13 @@ export async function fetchUpdateProfile(profile) {
   return data;
 }
 
-export function main() {
-  return null;
+export async function fetchTweets(handle) {
+  const res = await fetch(`${apiHost}/tweet?handle=${handle}`, {
+    credentials: 'include',
+  });
+
+  const { tweets } = await res.json();
+  if (res.status === 200) return tweets;
+
+  return [];
 }

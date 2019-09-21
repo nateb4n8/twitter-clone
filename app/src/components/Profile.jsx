@@ -1,10 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
+  Fab,
+  Grid,
   makeStyles,
   Typography,
-  Grid,
-  Fab,
 } from '@material-ui/core';
 import {
   Link as LinkIcon,
@@ -16,8 +16,8 @@ import {
 } from '@material-ui/icons';
 import EditProfile from './EditProfile';
 import { authContext } from './AuthContext';
-// import { fetchProfile } from '../utils/api';
 import { bannerImagePath, profileImagePath } from '../utils/config';
+import TweetList from './TweetList';
 
 const useStyles = makeStyles((theme) => {
   const imgHeight = 120;
@@ -240,6 +240,7 @@ function Profile(props) {
           </Grid>
         </Grid>
       </div>
+      <TweetList handle={handle} />
     </div>
   );
 }
