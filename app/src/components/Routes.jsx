@@ -13,6 +13,7 @@ import { authContext } from './AuthContext';
 import AuthRoute from './AuthRoute';
 import Loading from './Loading';
 import Main from './Main';
+import TweetButton from './TweetButton';
 
 function Routes() {
   const { isAuthenticated, authenticating, profile } = React.useContext(authContext);
@@ -55,6 +56,7 @@ function Routes() {
 
         <Route render={() => <Redirect to="/" />} />
       </Switch>
+      <AuthRoute component={TweetButton} />
     </Router>
   );
 }

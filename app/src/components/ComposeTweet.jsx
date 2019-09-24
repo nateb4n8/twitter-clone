@@ -37,14 +37,15 @@ const useStyles = makeStyles({
 });
 
 
-function ComposeTweet() {
+function ComposeTweet({ open, onClose }) {
   const classes = useStyles();
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
   const paperProps = fullScreen ? {} : { className: classes.paper };
   return (
     <Dialog
-      open
+      open={open}
+      onClose={onClose}
       fullWidth
       maxWidth="sm"
       fullScreen={fullScreen}
@@ -56,7 +57,7 @@ function ComposeTweet() {
           <Grid item>
             <Grid container justify="space-between">
               <Grid item>
-                <IconButton size="small" name="go-back">
+                <IconButton size="small" name="go-back" onClick={onClose}>
                   <ArrowBack />
                 </IconButton>
               </Grid>

@@ -29,7 +29,7 @@ describe('<ComposeTweet />', () => {
   });
 
   it('renders with a `Tweet` button', () => {
-    const wrapper = mount(<ComposeTweet />);
+    const wrapper = mount(<ComposeTweet open />);
 
     const tweetButton = wrapper
       .find('button')
@@ -39,7 +39,7 @@ describe('<ComposeTweet />', () => {
   });
 
   it('renders with a `back` button', () => {
-    const wrapper = mount(<ComposeTweet />);
+    const wrapper = mount(<ComposeTweet open />);
 
     const goBackButton = wrapper
       .find('button')
@@ -49,7 +49,7 @@ describe('<ComposeTweet />', () => {
   });
 
   it('renders with a tweet text field', () => {
-    const wrapper = mount(<ComposeTweet />);
+    const wrapper = mount(<ComposeTweet open />);
 
     const textInput = wrapper
       .find('textarea')
@@ -59,7 +59,7 @@ describe('<ComposeTweet />', () => {
   });
 
   it('renders with an attach file button', () => {
-    const wrapper = mount(<ComposeTweet />);
+    const wrapper = mount(<ComposeTweet open />);
 
     const fileInput = wrapper
       .find('input')
@@ -69,7 +69,7 @@ describe('<ComposeTweet />', () => {
   });
 
   it('renders with a gif button', () => {
-    const wrapper = mount(<ComposeTweet />);
+    const wrapper = mount(<ComposeTweet open />);
 
     const gifButton = wrapper
       .find('button')
@@ -79,7 +79,7 @@ describe('<ComposeTweet />', () => {
   });
 
   it('renders with a poll button', () => {
-    const wrapper = mount(<ComposeTweet />);
+    const wrapper = mount(<ComposeTweet open />);
 
     const pollButton = wrapper
       .find('button')
@@ -89,7 +89,7 @@ describe('<ComposeTweet />', () => {
   });
 
   it('renders with an emoji button', () => {
-    const wrapper = mount(<ComposeTweet />);
+    const wrapper = mount(<ComposeTweet open />);
 
     const emojiButton = wrapper
       .find('button')
