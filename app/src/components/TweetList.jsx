@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {
   Avatar,
+  Box,
   List,
   ListItem,
   ListItemAvatar,
@@ -25,6 +26,15 @@ const useStyles = makeStyles(theme => ({
   },
   liText: {
     margin: 0,
+  },
+  liPrimary: {
+    fontSize: 16,
+  },
+  liPrimaryHandle: {
+    fontWeight: 600,
+  },
+  liPrimaryDate: {
+    fontWeight: 300,
   },
   avatar: {
     width: 50,
@@ -84,9 +94,20 @@ function TweetList({ handle, getHandleTweets }) {
               <ListItemText
                 className={classes.liText}
                 primary={(
-                  <Typography variant="caption">
-                    {`@${handle} ~ ${formatTweetDate(tweet.createdAt)}`}
-                  </Typography>
+                  <>
+                    <Typography
+                      component="span"
+                      className={`${classes.liPrimary} ${classes.liPrimaryHandle}`}
+                    >
+                      {`@${handle}`}
+                    </Typography>
+                    <Typography
+                      component="span"
+                      className={`${classes.liPrimary} ${classes.liPrimaryDate}`}
+                    >
+                      {` ⋅ ${formatTweetDate(tweet.createdAt)}`}
+                    </Typography>
+                  </>
                 )}
                 secondary={(
                   <Typography variant="caption" component="p">
