@@ -102,3 +102,21 @@ export async function fetchTweets(handle) {
 
   return [];
 }
+
+export async function fetchCreateTweet(tweet) {
+  const res = await fetch(`${apiHost}/tweet`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ body: tweet.text }),
+    credentials: 'include',
+  });
+
+  if (res.status === 200) {
+    const result = await res.json();
+    return result;
+  }
+
+  return {};
+}

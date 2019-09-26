@@ -16,8 +16,10 @@ import Gif from '@material-ui/icons/Gif';
 import Poll from '@material-ui/icons/Poll';
 import Mood from '@material-ui/icons/Mood';
 import { CircularProgress } from '@material-ui/core';
+import { blue, orange, red } from '@material-ui/core/colors';
+import { fetchCreateTweet } from '../utils/api';
 
-const useStyles = makeStyles({
+const useStyles = makeStyles(theme => ({
   dialog: {
     borderRadius: '50%',
   },
@@ -34,14 +36,30 @@ const useStyles = makeStyles({
   spacer: {
     flexGrow: 1,
   },
-});
+  circularProgress: {
+    color: ({ textLevel }) => [blue[500], orange[500], red[500]][textLevel],
+  },
+}));
 
 
 function ComposeTweet({ open, onClose }) {
-  const classes = useStyles();
+  const [text, setText] = React.useState('');
+  const textPercent = Math.round(text.length / 256 * 100);
+  const styleProps = { textLevel: 0 };
+  if (textPercent > 50) styleProps.textLevel = 1;
+  if (textPercent > 75) styleProps.textLevel = 2;
+
+  const classes = useStyles(styleProps);
   const theme = useTheme();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
   const paperProps = fullScreen ? {} : { className: classes.paper };
+
+  const handleSubmit = () => {
+    fetchCreateTweet({ text })
+      .then(onClose)
+      .catch(console.error);
+  };
+
   return (
     <Dialog
       open={open}
@@ -53,8 +71,8 @@ function ComposeTweet({ open, onClose }) {
       PaperProps={paperProps}
     >
       <DialogContent className={classes.content}>
-        <Grid container direction="column" spacing={2}>
-          <Grid item>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
             <Grid container justify="space-between">
               <Grid item>
                 <IconButton size="small" name="go-back" onClick={onClose}>
@@ -62,23 +80,35 @@ function ComposeTweet({ open, onClose }) {
                 </IconButton>
               </Grid>
               <Grid item>
-                <Fab name="tweet-submit" variant="extended" size="small" color="primary">
+                <Fab
+                  name="tweet-submit"
+                  variant="extended"
+                  size="small"
+                  color="primary"
+                  onClick={handleSubmit}
+                >
                   <Typography className={classes.next}>Tweet</Typography>
                 </Fab>
               </Grid>
             </Grid>
           </Grid>
-          <Grid item>
+          <Grid item xs={12}>
             <Divider />
           </Grid>
-          <Grid item>
-            <Grid container>
-              <Grid item xs={12}>
-                <TextField fullWidth multiline name="tweet-content" rows={5} />
-              </Grid>
-            </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              multiline
+              name="tweet-content"
+              rows={5}
+              value={text}
+              onChange={e => setText(e.target.value)}
+              inputProps={{
+                maxLength: 256,
+              }}
+            />
           </Grid>
-          <Grid item>
+          <Grid item xs={12}>
             <Grid container alignItems="center">
               <Grid item>
                 <FormLabel htmlFor="add-image">
@@ -111,7 +141,12 @@ function ComposeTweet({ open, onClose }) {
               </Grid>
               <Grid item className={classes.spacer} />
               <Grid item>
-                <CircularProgress variant="static" value={75} size={25} />
+                <CircularProgress
+                  variant="static"
+                  value={textPercent}
+                  className={classes.circularProgress}
+                  size={25}
+                />
               </Grid>
             </Grid>
           </Grid>
