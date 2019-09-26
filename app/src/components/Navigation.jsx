@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import { Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 
-import TweetButton from './TweetButton';
 import MenuButton from './MenuButton';
 
 const useStyles = makeStyles(theme => ({
@@ -19,16 +18,11 @@ function Navigation({ items }) {
   const classes = useStyles();
   return (
     <Grid container direction="column" spacing={1} className={classes.root}>
-
       {items.map(({ label, link, icon }) => (
         <Grid item key={label}>
           <MenuButton label={label} href={link} icon={icon} />
         </Grid>
       ))}
-
-      <Grid item>
-        <TweetButton />
-      </Grid>
     </Grid>
   );
 }

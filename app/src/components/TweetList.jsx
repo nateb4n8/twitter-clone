@@ -75,7 +75,6 @@ function TweetList({ handle, getHandleTweets }) {
 
   return (
     <>
-      <h1>tweet list</h1>
       {tweets.length > 0 && (
         <List dense>
           {tweets.map(tweet => (

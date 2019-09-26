@@ -5,7 +5,6 @@ import {
   Switch,
   Redirect,
 } from 'react-router-dom';
-import ProfileData from './ProfileData';
 import Join from './Join';
 import CreateAccount from './CreateAccount';
 import Login from './Login';
@@ -13,7 +12,6 @@ import { authContext } from './AuthContext';
 import AuthRoute from './AuthRoute';
 import Loading from './Loading';
 import Main from './Main';
-import TweetButton from './TweetButton';
 
 function Routes() {
   const { isAuthenticated, authenticating, profile } = React.useContext(authContext);
@@ -42,7 +40,7 @@ function Routes() {
         />
 
         <AuthRoute path="/home" component={Main} />
-        <AuthRoute path="/:handle" component={ProfileData} />
+        <AuthRoute path="/:handle" component={Main} />
 
         <Route
           exact
@@ -56,7 +54,6 @@ function Routes() {
 
         <Route render={() => <Redirect to="/" />} />
       </Switch>
-      <AuthRoute component={TweetButton} />
     </Router>
   );
 }

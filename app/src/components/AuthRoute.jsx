@@ -3,28 +3,37 @@ import { Route, Redirect } from 'react-router-dom';
 import { authContext } from './AuthContext';
 
 
-export default function AuthRoute({ component: Component, redirectTo = '/login', ...rest }) {
+export default function AuthRoute(props) {
+  const {
+    component: Component,
+    redirectTo = '/login',
+    noRedirect,
+    ...rest
+  } = props;
+
   const { isAuthenticated, authenticating } = React.useContext(authContext);
 
   return (
     <Route
       {...rest}
-      render={(props) => {
+      render={(renderProps) => {
         if (isAuthenticated) {
-          return <Component {...props} />;
+          return <Component {...renderProps} />;
         }
 
         if (authenticating) {
           return null;
         }
 
-        return (
-          <Redirect to={{
-            pathname: redirectTo,
-            state: { from: props.location },
-          }}
-          />
-        );
+        if (!noRedirect) {
+          return (
+            <Redirect to={{
+              pathname: redirectTo,
+              state: { from: renderProps.location },
+            }}
+            />
+          );
+        }
       }}
     />
   );
