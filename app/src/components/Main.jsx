@@ -5,7 +5,18 @@ import {
   Hidden,
   Grid,
   Paper,
-  Container,
+  TextField,
+  Card,
+  CardHeader,
+  IconButton,
+  CardContent,
+  List,
+  ListItem,
+  ListItemAvatar,
+  Avatar,
+  ListItemText,
+  ListItemSecondaryAction,
+  Fab,
 } from '@material-ui/core';
 import Home from '@material-ui/icons/Home';
 import Notifications from '@material-ui/icons/Notifications';
@@ -45,6 +56,65 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'center',
     width: '100%',
   },
+
+
+  root: {
+    display: 'flex',
+    justifyContent: 'center',
+    width: '100vw',
+
+    '& .left': {
+      position: 'fixed',
+      left: 'calc(50% - 300px - 300px)',
+      height: '100vh',
+      width: 300,
+      [theme.breakpoints.only('xs')]: {
+        width: 0,
+        overflow: 'hidden',
+      },
+      [theme.breakpoints.only('sm')]: {
+        width: 75,
+        left: 0,
+      },
+      [theme.breakpoints.only('md')]: {
+        width: 75,
+        left: 'calc(50% - 350px - 75px)',
+      },
+    },
+
+    '& .center': {
+      height: '100%',
+      width: 600,
+      [theme.breakpoints.only('xs')]: {
+        width: '100%',
+      },
+      [theme.breakpoints.only('sm')]: {
+        marginLeft: 75,
+        width: 'calc(100% - 75px)',
+      },
+      [theme.breakpoints.only('md')]: {
+        width: 500,
+        marginRight: 200,
+      },
+    },
+
+    '& .right': {
+      position: 'fixed',
+      left: 'calc(50% + 300px)',
+
+      backgroundColor: 'grey',
+      height: '100vh',
+      width: 300,
+      [theme.breakpoints.down('sm')]: {
+        width: 0,
+        overflow: 'hidden',
+      },
+      [theme.breakpoints.only('md')]: {
+        left: 'calc(50% + 150px)',
+      },
+    },
+  },
+
 }));
 
 
@@ -58,105 +128,90 @@ const menuItems = [
   { label: 'Profile', link: '#Profile', icon: <Face /> },
 ];
 
-/*
-<Paper className={classes.paper}>
-  <Grid container direction="column">
-    <Grid item xs={12}>
-      <TextField
-        variant="outlined"
-        label="Search Twitter"
-      />
-    </Grid>
-    <Grid item>
-      <Card>
-        <CardHeader
-          title="Trends for you"
-          action={<IconButton>@</IconButton>}
-        />
-        <CardContent>
-          <List>
-            <ListItem button>Lorem, ipsum dolor sit amet consectetur</ListItem>
-            <ListItem button>Lorem, ipsum dolor sit amet consectetur</ListItem>
-            <ListItem button>Lorem, ipsum dolor sit amet consectetur</ListItem>
-            <ListItem button>Lorem, ipsum dolor sit amet consectetur</ListItem>
-            <ListItem button>Lorem, ipsum dolor sit amet consectetur</ListItem>
-
-            <ListItem button>Show more</ListItem>
-          </List>
-        </CardContent>
-      </Card>
-    </Grid>
-
-    <Grid item>
-      <Card>
-        <CardHeader
-          title="Who to follow"
-        />
-        <CardContent>
-          <List>
-            <ListItem button>
-              <ListItemAvatar><Avatar>G</Avatar></ListItemAvatar>
-              <ListItemText
-                primary="Breathtaking"
-                secondary="@keanureeves"
-              />
-              <ListItemSecondaryAction>
-                <Fab variant="extended" size="small">Follow</Fab>
-              </ListItemSecondaryAction>
-            </ListItem>
-
-            <ListItem button>Show more</ListItem>
-          </List>
-        </CardContent>
-      </Card>
-    </Grid>
-
-  </Grid>
-</Paper>
-*/
 function Main() {
   const classes = useStyles();
 
   return (
     <>
-      <div
-        style={{
-          width: '100%',
-          position: 'fixed',
-          zIndex: 1000,
-        }}
-      >
-        <Container className={classes.container}>
-          <Grid container justify="space-between">
-            <Grid item sm={2} md={1} lg={3}>
-              <div className={classes.navigation}>
-                <Grid container direction="column" spacing={4}>
-                  <Grid item>
-                    <Hidden only="xs">
-                      <Navigation items={menuItems} />
-                    </Hidden>
-                  </Grid>
-                  <Grid item>
-                    <div className={classes.tweetButton}>
-                      <TweetButton />
-                    </div>
-                  </Grid>
-                </Grid>
-              </div>
+      <div className={classes.root}>
+        <div className="left">
+          <div className={classes.navigation}>
+            <Grid container direction="column" spacing={4}>
+              <Grid item>
+                <Hidden only="xs">
+                  <Navigation items={menuItems} />
+                </Hidden>
+              </Grid>
+              <Grid item>
+                <div className={classes.tweetButton}>
+                  <TweetButton />
+                </div>
+              </Grid>
             </Grid>
-            <Grid item md={4} lg={3} />
-          </Grid>
-        </Container>
+          </div>
+        </div>
+        <div className="center">
+          <Paper className={classes.paper} elevation={3} square>
+            <Route path="/:handle" component={ProfileData} />
+          </Paper>
+        </div>
+        <div className="right">
+          <Paper className={classes.paper}>
+            <Grid container direction="column">
+              <Grid item xs={12}>
+                <TextField
+                  variant="outlined"
+                  label="Search Twitter"
+                />
+              </Grid>
+              <Grid item>
+                <Card>
+                  <CardHeader
+                    title="Trends for you"
+                    action={<IconButton>@</IconButton>}
+                  />
+                  <CardContent>
+                    <List>
+                      <ListItem button>Lorem, ipsum dolor sit amet consectetur</ListItem>
+                      <ListItem button>Lorem, ipsum dolor sit amet consectetur</ListItem>
+                      <ListItem button>Lorem, ipsum dolor sit amet consectetur</ListItem>
+                      <ListItem button>Lorem, ipsum dolor sit amet consectetur</ListItem>
+                      <ListItem button>Lorem, ipsum dolor sit amet consectetur</ListItem>
+
+                      <ListItem button>Show more</ListItem>
+                    </List>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              <Grid item>
+                <Card>
+                  <CardHeader
+                    title="Who to follow"
+                  />
+                  <CardContent>
+                    <List>
+                      <ListItem button>
+                        <ListItemAvatar><Avatar>G</Avatar></ListItemAvatar>
+                        <ListItemText
+                          primary="Breathtaking"
+                          secondary="@keanureeves"
+                        />
+                        <ListItemSecondaryAction>
+                          <Fab variant="extended" size="small">Follow</Fab>
+                        </ListItemSecondaryAction>
+                      </ListItem>
+
+                      <ListItem button>Show more</ListItem>
+                    </List>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+            </Grid>
+          </Paper>
+        </div>
       </div>
-      <Container className={classes.container}>
-        <Grid container justify="center" alignItems="stretch" style={{ height: '100%' }}>
-          <Grid item sm={10} md={7} lg={6}>
-            <Paper className={classes.paper} elevation={3} square>
-              <Route path="/:handle" component={ProfileData} />
-            </Paper>
-          </Grid>
-        </Grid>
-      </Container>
     </>
   );
 }
