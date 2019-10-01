@@ -16,6 +16,7 @@ const schema = Joi.object({
   profileImageSrc: Joi.string().min(9),
   followers: Joi.array().items(Joi.string().min(1).max(30)),
   following: Joi.array().items(Joi.string().min(1).max(30)),
+  favoriteTweets: Joi.array().items(Joi.string().min(1).max(30)),
 }).required();
 
 class User {
@@ -31,6 +32,7 @@ class User {
     profileImageSrc,
     followers,
     following,
+    favoriteTweets,
   }) {
     this._id = _id;
     this.name = name;
@@ -44,6 +46,7 @@ class User {
     this.profileImageSrc = profileImageSrc || `${assetStore}/profileImages/${this.handle}`;
     this.followers = followers || [];
     this.following = following || [];
+    this.favoriteTweets = favoriteTweets || [];
   }
 
   generateAuthToken() {

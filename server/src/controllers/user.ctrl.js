@@ -187,9 +187,64 @@ async function follow(req, res) {
   res.send({ following });
 }
 
+// need to make this function a transaction
+async function toggleFavoriteTweet(req, res) {
+  const { id } = req.token;
+  const { 'tweet': tweetId } = req.query;
+  const { db } = req.app.locals;
+
+  let user;
+  let tweet;
+  try {
+    user = await db.users.findOne({ _id: ObjectId(id) });
+    tweet = await db.tweets.findOne({ _id: ObjectId(tweetId) });
+  } catch (error) {
+    winston.error(error);
+    return res.sendStatus(500);
+  }
+
+  if (!user) return res.status(400).send('user not found');
+  if (!tweet) return res.status(400).send('tweet not found');
+
+  if (tweet.creatorId.equals(user._id)) {
+    return res.status(400).send('users cannot favorite their own tweets');
+  }
+
+  const favoriteTweets = new Set(user.favoriteTweets);
+  const favoritedBy = new Set(tweet.favoritedBy);
+  if (favoriteTweets.has(tweetId)) {
+    favoriteTweets.delete(tweetId);
+    favoritedBy.delete(id);
+    winston.info('tweet unfavorited');
+  } else {
+    favoriteTweets.add(tweetId);
+    favoritedBy.add(id);
+    winston.info('tweet has been added');
+  }
+
+  try {
+    user = await db.users.findOneAndUpdate(
+      { _id: ObjectId(id) },
+      { $set: { favoriteTweets: [...favoriteTweets] } },
+      { returnOriginal: false },
+    );
+    tweet = await db.tweets.findOneAndUpdate(
+      { _id: ObjectId(tweetId) },
+      { $set: { favoritedBy: [...favoritedBy] } },
+      { returnOriginal: false },
+    );
+  } catch (error) {
+    winston.error(error);
+    return res.sendStatus(500);
+  }
+
+  res.send({ favoriteTweets: user.value.favoriteTweets });
+}
+
 module.exports = {
   getUser,
   getUserByHandle,
   updateProfile,
   follow,
+  toggleFavoriteTweet,
 };
