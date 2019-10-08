@@ -190,7 +190,7 @@ async function follow(req, res) {
 // need to make this function a transaction
 async function toggleFavoriteTweet(req, res) {
   const { id } = req.token;
-  const { 'tweet': tweetId } = req.query;
+  const { tweet: tweetId } = req.query;
   const { db } = req.app.locals;
 
   let user;
@@ -212,13 +212,13 @@ async function toggleFavoriteTweet(req, res) {
 
   const favoriteTweets = new Set(user.favoriteTweets);
   const favoritedBy = new Set(tweet.favoritedBy);
-  if (favoriteTweets.has(tweetId)) {
-    favoriteTweets.delete(tweetId);
-    favoritedBy.delete(id);
+  if (favoriteTweets.has(ObjectId(tweetId))) {
+    favoriteTweets.delete(ObjectId(tweetId));
+    favoritedBy.delete(ObjectId(id));
     winston.info('tweet unfavorited');
   } else {
-    favoriteTweets.add(tweetId);
-    favoritedBy.add(id);
+    favoriteTweets.add(ObjectId(tweetId));
+    favoritedBy.add(ObjectId(id));
     winston.info('tweet has been added');
   }
 
@@ -241,10 +241,82 @@ async function toggleFavoriteTweet(req, res) {
   res.send({ favoriteTweets: user.value.favoriteTweets });
 }
 
+async function getUserLikes(req, res) {
+  const { handle } = req.query;
+  const { db } = req.app.locals;
+  let user;
+  let likes;
+  try {
+    user = await db.users.findOne({ handle });
+    const pipeline = [
+      { $match: { handle } },
+      { $project: { favoriteTweets: 1 } },
+      {
+        $unwind: {
+          path: '$favoriteTweets', 
+          preserveNullAndEmptyArrays: true,
+        }
+      },
+      {
+        $lookup: {
+          from: 'tweets', 
+          localField: 'favoriteTweets', 
+          foreignField: '_id', 
+          as: 'tweet',
+        }
+      },
+      {
+        $unwind: {
+          path: '$tweet', 
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $lookup: {
+          from: 'users', 
+          localField: 'tweet.creatorId', 
+          foreignField: '_id', 
+          as: 'creator'
+        }
+      },
+      {
+        $unwind: {
+          path: '$creator', 
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $group: {
+          _id: '$_id', 
+          tweets: {
+            $push: {
+              _id: '$tweet._id', 
+              createdAt: '$tweet.createdAt', 
+              body: '$tweet.body', 
+              creatorHandle: '$creator.handle', 
+              creatorName: '$creator.name'
+            }
+          }
+        }
+      }
+    ];
+    likes = await db.users.aggregate(pipeline).toArray();
+    likes = likes[0].tweets;
+  } catch (error) {
+    winston.error(error);
+    return res.sendStatus(500);
+  }
+
+  if (!user) return res.status(400).send('user not found');
+  
+  res.send({ likes });
+}
+
 module.exports = {
+  follow,
   getUser,
   getUserByHandle,
-  updateProfile,
-  follow,
+  getUserLikes,
   toggleFavoriteTweet,
+  updateProfile,
 };

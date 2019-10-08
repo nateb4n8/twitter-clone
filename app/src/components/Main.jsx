@@ -62,6 +62,8 @@ const useStyles = makeStyles(theme => ({
     display: 'flex',
     justifyContent: 'center',
     width: '100vw',
+    // height: '100vh',
+    alignItems: 'stretch',
 
     '& .left': {
       position: 'fixed',
@@ -83,7 +85,7 @@ const useStyles = makeStyles(theme => ({
     },
 
     '& .center': {
-      height: '100%',
+      minHeight: '100vh',
       width: 600,
       [theme.breakpoints.only('xs')]: {
         width: '100%',

@@ -6,6 +6,9 @@ import {
   makeStyles,
   Typography,
   IconButton,
+  Tabs,
+  AppBar,
+  Tab,
 } from '@material-ui/core';
 import {
   Link as LinkIcon,
@@ -46,6 +49,9 @@ const useStyles = makeStyles((theme) => {
       borderRadius: '50%',
       borderStyle: 'solid',
       backgroundColor: 'grey',
+    },
+    appBar: {
+      backgroundColor: 'white',
     },
   };
 });
@@ -98,6 +104,7 @@ function Profile(props) {
     handleNotFound,
   } = props;
 
+  const [view, setView] = React.useState('TWEETS');
   const [editOpen, setEditOpen] = React.useState(false);
   const { profile: { profileImageId, bannerImageId } } = React.useContext(authContext);
 
@@ -244,7 +251,21 @@ function Profile(props) {
           </Grid>
         </Grid>
       </div>
-      <TweetList handle={handle} />
+      <AppBar position="static" color="default" elevation={0} className={classes.appBar}>
+        <Tabs
+          value={view}
+          onChange={(e, v) => setView(v)}
+          indicatorColor="primary"
+          textColor="primary"
+          variant="fullWidth"
+          aria-label=""
+        >
+          <Tab label="Tweets" value="TWEETS" />
+          <Tab label="Likes" value="LIKES" />
+        </Tabs>
+      </AppBar>
+      {view === 'TWEETS' && <TweetList handle={handle} />}
+      {view === 'LIKES' && <TweetList handle={handle} favorites />}
     </div>
   );
 }

@@ -10,7 +10,7 @@ import {
 } from '@material-ui/core';
 import moment from 'moment';
 import { makeStyles } from '@material-ui/styles';
-import { fetchTweets } from '../utils/api';
+import { fetchTweets, fetchFavorites } from '../utils/api';
 import { profileImagePath } from '../utils/config';
 
 
@@ -63,14 +63,21 @@ function formatTweetDate(date) {
   return createDate.format('MMM D, YYYY');
 }
 
-function TweetList({ handle, getHandleTweets }) {
+function TweetList({ handle, getHandleTweets, favorites }) {
   const classes = useStyles();
   const [tweets, setTweets] = React.useState([]);
 
   React.useEffect(() => {
-    fetchTweets(handle)
-      .then(setTweets)
-      .catch(console.error);
+    if (favorites) {
+      fetchFavorites(handle)
+        .then(setTweets)
+        .catch(console.error);
+    }
+    else {
+      fetchTweets(handle)
+        .then(setTweets)
+        .catch(console.error);
+    }
   }, [handle, getHandleTweets]);
 
   return (
@@ -82,9 +89,9 @@ function TweetList({ handle, getHandleTweets }) {
 
               <ListItemAvatar className={classes.liAvatar}>
                 <Avatar
-                  aria-label={`${handle} portrait`}
-                  alt={`${handle} portrait`}
-                  src={`${profileImagePath}${handle}`}
+                  aria-label={`${tweet.creatorHandle} portrait`}
+                  alt={`${tweet.creatorHandle} portrait`}
+                  src={`${profileImagePath}${tweet.creatorHandle}`}
                   className={classes.avatar}
                 />
               </ListItemAvatar>
@@ -97,7 +104,7 @@ function TweetList({ handle, getHandleTweets }) {
                       component="span"
                       className={`${classes.liPrimary} ${classes.liPrimaryHandle}`}
                     >
-                      {`@${handle}`}
+                      {`@${tweet.creatorHandle}`}
                     </Typography>
                     <Typography
                       component="span"
@@ -124,11 +131,13 @@ function TweetList({ handle, getHandleTweets }) {
 
 TweetList.defaultProps = {
   getHandleTweets: true,
+  favorites: false,
 };
 
 TweetList.propTypes = {
   handle: PropTypes.string.isRequired,
   getHandleTweets: PropTypes.bool,
+  favorites: PropTypes.bool,
 };
 
 export default TweetList;

@@ -35,18 +35,23 @@ async function getTweetsByUser(req, res) {
   const { db } = req.app.locals;
   let tweets;
   try {
-    const { _id: creatorId } = await db.users.findOne({ handle });
+    const { _id: creatorId, name: creatorName } = await db.users.findOne({ handle });
     tweets = await db.tweets.find({ creatorId })
       .sort({ createdAt: -1 })
       .project({ _id: 1, body: 1, createdAt: 1 })
       .toArray();
+    tweets = tweets.map(({ _id: id, ...rest }) => ({
+      id,
+      creatorName,
+      creatorHandle: handle,
+      ...rest
+    }));
   } catch (error) {
     winston.error(error);
     return res.sendStatus(500);
   }
   
   if (tweets) {
-    tweets = tweets.map(({ _id: id, ...rest }) => ({ id, ...rest }));
     res.send({ tweets });
   } else {
     res.status(404).send('User not found');

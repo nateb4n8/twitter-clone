@@ -103,6 +103,17 @@ export async function fetchTweets(handle) {
   return [];
 }
 
+export async function fetchFavorites(handle) {
+  const res = await fetch(`${apiHost}/favorite?handle=${handle}`, {
+    credentials: 'include',
+  });
+
+  const { likes } = await res.json();
+  if (res.status === 200) return likes;
+
+  return [];
+}
+
 export async function fetchCreateTweet(tweet) {
   const res = await fetch(`${apiHost}/tweet`, {
     method: 'POST',
