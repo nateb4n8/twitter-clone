@@ -6,7 +6,7 @@ const Jimp = require('jimp');
 const { profileSchema } = require('../models/profile.model');
 const { User } = require('../models/user.model');
 const { imageAssetsPath } = require('../../startup/config');
-
+const { Tweet } = require('../models/tweet.model');
 
 function getUserResponse(userDoc) {
   const result = pick(userDoc, [
@@ -189,15 +189,15 @@ async function follow(req, res) {
 
 // need to make this function a transaction
 async function toggleFavoriteTweet(req, res) {
-  const { id } = req.token;
-  const { tweet: tweetId } = req.query;
+  const id = ObjectId(req.token.id);
+  const tweetId = ObjectId(req.query.tweet);
   const { db } = req.app.locals;
 
   let user;
   let tweet;
   try {
-    user = await db.users.findOne({ _id: ObjectId(id) });
-    tweet = await db.tweets.findOne({ _id: ObjectId(tweetId) });
+    user = await db.users.findOne({ _id: id });
+    tweet = await db.tweets.findOne({ _id: tweetId });
   } catch (error) {
     winston.error(error);
     return res.sendStatus(500);
@@ -206,31 +206,33 @@ async function toggleFavoriteTweet(req, res) {
   if (!user) return res.status(400).send('user not found');
   if (!tweet) return res.status(400).send('tweet not found');
 
-  if (tweet.creatorId.equals(user._id)) {
-    return res.status(400).send('users cannot favorite their own tweets');
-  }
+  tweet = new Tweet({ ...tweet, _id: tweetId });
 
-  const favoriteTweets = new Set(user.favoriteTweets);
-  const favoritedBy = new Set(tweet.favoritedBy);
-  if (favoriteTweets.has(ObjectId(tweetId))) {
-    favoriteTweets.delete(ObjectId(tweetId));
-    favoritedBy.delete(ObjectId(id));
+  const favoriteTweets = new Set(user.favoriteTweets.map(ft => ft.toString()));
+  const favoritedBy = new Set(tweet.favoritedBy.map(fb => fb.toString()));
+  if (favoriteTweets.has(tweetId.toString())) {
+    favoriteTweets.delete(tweetId.toString());
+    favoritedBy.delete(id.toString());
     winston.info('tweet unfavorited');
   } else {
-    favoriteTweets.add(ObjectId(tweetId));
-    favoritedBy.add(ObjectId(id));
+    favoriteTweets.add(tweetId.toString());
+    favoritedBy.add(id.toString());
     winston.info('tweet has been added');
   }
 
   try {
     user = await db.users.findOneAndUpdate(
-      { _id: ObjectId(id) },
-      { $set: { favoriteTweets: [...favoriteTweets] } },
+      { _id: id },
+      { $set: { 
+        favoriteTweets: [...favoriteTweets].map(ft => ObjectId(ft))
+      } },
       { returnOriginal: false },
     );
     tweet = await db.tweets.findOneAndUpdate(
-      { _id: ObjectId(tweetId) },
-      { $set: { favoritedBy: [...favoritedBy] } },
+      { _id: tweetId },
+      { $set: { 
+        favoritedBy: [...favoritedBy].map(fb => ObjectId(fb))
+      } },
       { returnOriginal: false },
     );
   } catch (error) {
@@ -282,7 +284,12 @@ async function getUserLikes(req, res) {
       {
         $unwind: {
           path: '$creator', 
-          preserveNullAndEmptyArrays: true
+          preserveNullAndEmptyArrays: false,
+        }
+      },
+      {
+        $sort: {
+          'tweet.createdAt': -1,
         }
       },
       {
@@ -290,18 +297,21 @@ async function getUserLikes(req, res) {
           _id: '$_id', 
           tweets: {
             $push: {
-              _id: '$tweet._id', 
+              id: '$tweet._id', 
               createdAt: '$tweet.createdAt', 
               body: '$tweet.body', 
               creatorHandle: '$creator.handle', 
-              creatorName: '$creator.name'
+              creatorName: '$creator.name',
             }
           }
         }
       }
     ];
     likes = await db.users.aggregate(pipeline).toArray();
-    likes = likes[0].tweets;
+    if (likes.length > 0) {
+      likes = likes[0].tweets;
+      likes = likes.map(like => ({ ...like, isFavorite: true }))
+    }
   } catch (error) {
     winston.error(error);
     return res.sendStatus(500);

@@ -114,6 +114,18 @@ export async function fetchFavorites(handle) {
   return [];
 }
 
+export async function fetchToggleFavorite(id) {
+  const res = await fetch(`${apiHost}/favorite?tweet=${id}`, {
+    method: 'PUT',
+    credentials: 'include',
+  });
+
+  const { favoriteTweets } = await res.json();
+  if (res.status === 200) return favoriteTweets;
+
+  return [];
+}
+
 export async function fetchCreateTweet(tweet) {
   const res = await fetch(`${apiHost}/tweet`, {
     method: 'POST',

@@ -2,15 +2,19 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {
   Avatar,
+  IconButton,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
   Typography,
+  Grid,
 } from '@material-ui/core';
 import moment from 'moment';
+import { red } from '@material-ui/core/colors';
 import { makeStyles } from '@material-ui/styles';
-import { fetchTweets, fetchFavorites } from '../utils/api';
+import { Favorite as FavoriteIcon, FavoriteBorder as NonFavoriteIcon } from '@material-ui/icons';
+import { fetchTweets, fetchFavorites, fetchToggleFavorite } from '../utils/api';
 import { profileImagePath } from '../utils/config';
 
 
@@ -38,6 +42,10 @@ const useStyles = makeStyles(theme => ({
   avatar: {
     width: 50,
     height: 50,
+  },
+  favoriteButton: {
+    padding: 0,
+    color: red[500],
   },
 }));
 
@@ -67,18 +75,28 @@ function TweetList({ handle, getHandleTweets, favorites }) {
   const classes = useStyles();
   const [tweets, setTweets] = React.useState([]);
 
-  React.useEffect(() => {
+  const getTweets = (targetHandle) => {
     if (favorites) {
-      fetchFavorites(handle)
+      fetchFavorites(targetHandle)
         .then(setTweets)
         .catch(console.error);
     }
     else {
-      fetchTweets(handle)
+      fetchTweets(targetHandle)
         .then(setTweets)
         .catch(console.error);
     }
+  };
+
+  React.useEffect(() => {
+    getTweets(handle);
   }, [handle, getHandleTweets]);
+
+  const handleFavorite = ({ id }) => {
+    fetchToggleFavorite(id)
+      .then(() => getTweets(handle))
+      .catch(console.error);
+  };
 
   return (
     <>
@@ -98,6 +116,7 @@ function TweetList({ handle, getHandleTweets, favorites }) {
 
               <ListItemText
                 className={classes.liText}
+                disableTypography
                 primary={(
                   <>
                     <Typography
@@ -115,9 +134,21 @@ function TweetList({ handle, getHandleTweets, favorites }) {
                   </>
                 )}
                 secondary={(
-                  <Typography variant="caption" component="p">
-                    {tweet.body}
-                  </Typography>
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <Typography variant="caption">
+                        {tweet.body}
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                      <IconButton className={classes.favoriteButton} onClick={() => handleFavorite(tweet)}>
+                        {tweet.isFavorite === true
+                          ? <FavoriteIcon />
+                          : <NonFavoriteIcon />
+                        }
+                      </IconButton>
+                    </Grid>
+                  </Grid>
                 )}
               />
 

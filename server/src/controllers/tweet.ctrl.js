@@ -32,20 +32,27 @@ async function getTweetsByUser(req, res) {
   const { handle } = req.query;
   if (!handle) return res.status(400).send('handle is required');
 
+  const { id } = req.token;
+
   const { db } = req.app.locals;
   let tweets;
   try {
+    const { currUserHandle } = await db.users.findOne({ _id: ObjectId(id) });
+
     const { _id: creatorId, name: creatorName } = await db.users.findOne({ handle });
     tweets = await db.tweets.find({ creatorId })
       .sort({ createdAt: -1 })
-      .project({ _id: 1, body: 1, createdAt: 1 })
+      .project({ _id: 1, body: 1, createdAt: 1, favoritedBy: 1 })
       .toArray();
-    tweets = tweets.map(({ _id: id, ...rest }) => ({
+
+    tweets = tweets.map(({ _id: id, favoritedBy = false, ...rest }) => ({
       id,
       creatorName,
       creatorHandle: handle,
+      isFavorite: favoritedBy && favoritedBy.includes(currUserHandle),
       ...rest
     }));
+
   } catch (error) {
     winston.error(error);
     return res.sendStatus(500);
