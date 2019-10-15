@@ -61,15 +61,13 @@ const useStyles = makeStyles(theme => ({
   root: {
     display: 'flex',
     justifyContent: 'center',
-    width: '100vw',
+    width: '100%',
     // height: '100vh',
     alignItems: 'stretch',
 
     '& .left': {
       position: 'fixed',
-      left: 'calc(50% - 300px - 300px)',
       height: '100vh',
-      width: 300,
       [theme.breakpoints.only('xs')]: {
         width: 0,
         overflow: 'hidden',
@@ -80,7 +78,11 @@ const useStyles = makeStyles(theme => ({
       },
       [theme.breakpoints.only('md')]: {
         width: 75,
-        left: 'calc(50% - 350px - 75px)',
+        right: 'calc(50% + 250px)',
+      },
+      [theme.breakpoints.up('lg')]: {
+        left: 'calc(50% - 300px - 300px)',
+        width: 300,
       },
     },
 
@@ -91,12 +93,11 @@ const useStyles = makeStyles(theme => ({
         width: '100%',
       },
       [theme.breakpoints.only('sm')]: {
-        marginLeft: 75,
         width: 'calc(100% - 75px)',
+        marginLeft: 75,
       },
       [theme.breakpoints.only('md')]: {
         width: 500,
-        marginRight: 200,
       },
     },
 
@@ -157,7 +158,7 @@ function Main() {
             <Route path="/:handle" component={ProfileData} />
           </Paper>
         </div>
-        <div className="right">
+        {/* <div className="right">
           <Paper className={classes.paper}>
             <Grid container direction="column">
               <Grid item xs={12}>
@@ -212,7 +213,8 @@ function Main() {
 
             </Grid>
           </Paper>
-        </div>
+        </div> */}
+
       </div>
     </>
   );
