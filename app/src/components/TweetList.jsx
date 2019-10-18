@@ -92,10 +92,18 @@ function TweetList({ handle, getHandleTweets, favorites }) {
     getTweets(handle);
   }, [handle, getHandleTweets]);
 
-  const handleFavorite = ({ id }) => {
-    fetchToggleFavorite(id)
-      .then(() => getTweets(handle))
-      .catch(console.error);
+  const handleFavorite = async ({ id }) => {
+    try {
+      await fetchToggleFavorite(id);
+      const nextTweets = tweets.map(t => (t.id !== id ? t : ({
+        ...t,
+        isFavorite: !t.isFavorite,
+      })));
+      setTweets(nextTweets);
+    }
+    catch (error) {
+      console.error(error);
+    }
   };
 
   return (
