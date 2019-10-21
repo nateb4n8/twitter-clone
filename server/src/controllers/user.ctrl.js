@@ -32,7 +32,7 @@ async function getUser(req, res) {
   const { db } = req.app.locals;
   let user;
   try {
-    user = await db.collection('users').findOne({ _id: ObjectId(id) });
+    user = await db.collection('users').findOne({ _id: id });
   } catch (error) {
     winston.error(error);
     return res.sendStatus(500);
@@ -72,7 +72,7 @@ async function updateProfile(req, res) {
   const { error } = profileSchema.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   
-  const filter = { _id: ObjectId(id) };
+  const filter = { _id: id };
   let user = await db.collection('users')
     .findOne(filter)
     .catch(error => winston.error(error) || null);
@@ -189,7 +189,7 @@ async function follow(req, res) {
 
 // need to make this function a transaction
 async function toggleFavoriteTweet(req, res) {
-  const id = ObjectId(req.token.id);
+  const { id } = req.token;
   const tweetId = ObjectId(req.query.tweet);
   const { db } = req.app.locals;
 
@@ -213,11 +213,9 @@ async function toggleFavoriteTweet(req, res) {
   if (favoriteTweets.has(tweetId.toString())) {
     favoriteTweets.delete(tweetId.toString());
     favoritedBy.delete(id.toString());
-    winston.info('tweet unfavorited');
   } else {
     favoriteTweets.add(tweetId.toString());
     favoritedBy.add(id.toString());
-    winston.info('tweet has been added');
   }
 
   try {

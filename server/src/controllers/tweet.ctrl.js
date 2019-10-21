@@ -7,7 +7,7 @@ async function createTweet(req, res) {
   const { id } = req.token;
   const tweet = new Tweet({
     ...req.body,
-    creatorId: new ObjectId(id),
+    creatorId: id,
   })
   const { error } = tweetSchema.validate(tweet);
   if (error) return res.status(404).send(error.details[0].message);
@@ -34,7 +34,7 @@ function checkFavorite(favorites = [], id = null) {
   }
 
   for (let i=0; i<favorites.length; i++) {
-    if (ObjectId(id).equals(favorites[i])) {
+    if (id.equals(favorites[i])) {
       return true;
     }
   }
@@ -88,7 +88,7 @@ async function deleteTweet(req, res) {
   try {
     result = await db.tweets.deleteOne({
       _id: ObjectId(tweetId),
-      creatorId: ObjectId(id),
+      creatorId: id,
     });
   } catch (error) {
     winston.error(error);
