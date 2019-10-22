@@ -1,5 +1,5 @@
 const express = require('express');
-const { port } = require('./startup/config');
+const { port, env } = require('./startup/config');
 const { winston } = require('./startup/logger');
 const getDbClient = require('./startup/db');
 const routes = require('./src/routers/index.router');
@@ -11,7 +11,8 @@ async function main() {
   middleware(app);
 
   const client = await getDbClient();
-  const db = await client.db('twitter');
+  const dbName = env !== 'test' ? 'twitter' : 'test';
+  const db = await client.db(dbName);
   app.locals.db = {
     users: db.collection('users'),
     tweets: db.collection('tweets'),
@@ -20,12 +21,18 @@ async function main() {
 
   app.use(routes);
 
-  return app.listen(
-    port, 
-    () => winston.info(`Listening on port: ${port}`)
-  );
-}
+  if (env !== 'test') {
+    const server = app.listen(
+      port, 
+      () => winston.info(`Listening on port: ${port}`)
+    );
+    server.on('close', async () => {
+      winston.info('Server is closing');
+      await client.close();
+    });
+  }
 
-main();
+  return app;
+}
 
 module.exports = main;

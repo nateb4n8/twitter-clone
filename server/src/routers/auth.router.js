@@ -5,7 +5,7 @@ const { getUser } = require('../controllers/user.ctrl');
 
 const router = express.Router();
 
-router.post('/signup', verifyAuth({ blockOnAuth: true }),  signup);
+router.post('/signup', verifyAuth({ blockOnAuth: true }), signup);
 router.post('/signin', verifyAuth({ blockOnAuth: true }), signin);
 router.get('/signin', verifyAuth({ requireToken: true }), getUser);
 
