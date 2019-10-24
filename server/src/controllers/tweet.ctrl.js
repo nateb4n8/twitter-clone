@@ -10,7 +10,7 @@ async function createTweet(req, res) {
     creatorId: id,
   })
   const { error } = tweetSchema.validate(tweet);
-  if (error) return res.status(404).send(error.details[0].message);
+  if (error) return res.status(400).send(error.details[0].message);
 
   const { db } = req.app.locals;
   let result;

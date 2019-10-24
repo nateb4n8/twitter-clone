@@ -4,8 +4,8 @@ const verifyAuth = require('../middleware/verifyAuth');
 
 
 const router = express.Router();
-router.post('', verifyAuth({ requireToken: true }),  createTweet);
 router.get('', verifyAuth({ requireToken: true }),  getTweetsByUser);
+router.post('', verifyAuth({ requireToken: true }),  createTweet);
 router.delete('', verifyAuth({ requireToken: true }),  deleteTweet);
 
 

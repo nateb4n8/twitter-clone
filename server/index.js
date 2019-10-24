@@ -35,4 +35,8 @@ async function main() {
   return app;
 }
 
+if (env !== 'test') {
+  main();
+}
+
 module.exports = main;
