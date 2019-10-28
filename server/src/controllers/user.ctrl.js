@@ -47,6 +47,8 @@ async function getUser(req, res) {
 
 async function getUserByHandle(req, res) {
   const { handle } = req.params;
+  if (!handle) return res.status(400).send('handle is required');
+
   const { db } = req.app.locals;
   let user;
   try {
@@ -243,7 +245,10 @@ async function toggleFavoriteTweet(req, res) {
 
 async function getUserLikes(req, res) {
   const { handle } = req.query;
+  if (!handle) return res.status(400).send('handle is required');
+  
   const { db } = req.app.locals;
+
   let user;
   let likes;
   try {
