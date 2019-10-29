@@ -28,6 +28,7 @@
     "express-fileupload": "^1.1.5",
     "express-winston": "^3.3.0",
     "jimp": "^0.6.4",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "mongodb": "^3.3.0-beta2",
     "saslprep": "^1.0.3",

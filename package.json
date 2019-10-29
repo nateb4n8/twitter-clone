@@ -1,14 +1,18 @@
 {
   "name": "twitter-clone",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Clone of Twitter's PWA",
   "main": "index.js",
   "scripts": {
     "app": "cd app && npm start",
     "server": "cd server && npm start",
     "containers": "docker-compose -f ./docker/docker-compose.yml up",
-    "test": "cd app && npm test",
-    "test-no-watch": "cd app && CI=true npm test -- --coverage"
+    "setup:app": "cd app && npm install",
+    "setup:server": "cd server && npm install",
+    "setup": "npm install && npm run setup:app && npm run setup:server",
+    "test:app": "cd app && CI=true npm test",
+    "test:server": "cd server && npm run test:once",
+    "test": "npm run test:app && npm run test:server"
   },
   "repository": {
     "type": "git",
@@ -29,11 +33,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "npm run test-no-watch"
+      "pre-commit": "npm run test"
     }
   },
-  "dependencies": {
-    "@hapi/joi": "^15.1.0",
-    "jsonwebtoken": "^8.5.1"
-  }
+  "dependencies": {}
 }
