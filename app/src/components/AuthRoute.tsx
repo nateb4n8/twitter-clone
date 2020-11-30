@@ -1,9 +1,15 @@
-import React from 'react';
-import { Route, Redirect } from 'react-router-dom';
+import React, { ReactElement } from 'react';
+import { Route, Redirect, RouteComponentProps } from 'react-router-dom';
 import { authContext } from './AuthContext';
 
+type AuthRouteProps = {
+  component: React.ComponentType<RouteComponentProps>;
+  redirectTo?: string;
+  noRedirect?: boolean;
+  [key: string]: unknown;
+};
 
-export default function AuthRoute(props) {
+export function AuthRoute(props: AuthRouteProps): ReactElement {
   const {
     component: Component,
     redirectTo = '/login',
@@ -27,10 +33,11 @@ export default function AuthRoute(props) {
 
         if (!noRedirect) {
           return (
-            <Redirect to={{
-              pathname: redirectTo,
-              state: { from: renderProps.location },
-            }}
+            <Redirect
+              to={{
+                pathname: redirectTo,
+                state: { from: renderProps.location },
+              }}
             />
           );
         }

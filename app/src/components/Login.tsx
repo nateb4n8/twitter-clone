@@ -1,24 +1,21 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core';
-import Grid from '@material-ui/core/Grid';
 import Container from '@material-ui/core/Container';
-import TextField from '@material-ui/core/TextField';
 import Fab from '@material-ui/core/Fab';
+import Grid from '@material-ui/core/Grid';
+import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-import { withRouter } from 'react-router-dom';
-
+import React, { ChangeEvent, ReactElement } from 'react';
 import { fetchLogin } from '../utils/api';
 import { authContext } from './AuthContext';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(() => ({
   button: {
     width: '100%',
     textTransform: 'none',
   },
 }));
 
-function TextInput(props) {
+function TextInput(props: TextFieldProps) {
   return (
     <TextField
       {...props}
@@ -31,7 +28,7 @@ function TextInput(props) {
   );
 }
 
-function Login(props) {
+export function Login(): ReactElement {
   const { setProfile } = React.useContext(authContext);
 
   const [email, setEmail] = React.useState('');
@@ -41,14 +38,15 @@ function Login(props) {
 
   const classes = useStyles();
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: ChangeEvent<unknown>) => {
     event.preventDefault();
 
     setLoading(true);
     setError(null);
 
-    const res = await fetchLogin({ email, password })
-      .catch(e => setError(e.message));
+    const res = await fetchLogin({ email, password }).catch((e) =>
+      setError(e.message),
+    );
 
     setLoading(false);
 
@@ -61,17 +59,23 @@ function Login(props) {
     <Container maxWidth="sm">
       <Grid container alignItems="stretch" direction="column" spacing={3}>
         <Grid item>
-          <Typography align="center" variant="h5">Log in to Twitter</Typography>
+          <Typography align="center" variant="h5">
+            Log in to Twitter
+          </Typography>
         </Grid>
 
-        {loading && <Grid item><Typography>Logging in</Typography></Grid>}
+        {loading && (
+          <Grid item>
+            <Typography>Logging in</Typography>
+          </Grid>
+        )}
 
         <Grid item>
           <TextInput
             type="email"
             name="email"
             label="Email"
-            onChange={e => setEmail(e.target.value)}
+            onChange={(e) => setEmail(e.target.value)}
             // onBlur={handleBlur}
             // error={Boolean(errors.email && touched.email)}
           />
@@ -81,7 +85,7 @@ function Login(props) {
             type="password"
             name="password"
             label="Password"
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             // onBlur={handleBlur}
             // error={Boolean(errors.password && touched.password)}
           />
@@ -99,15 +103,12 @@ function Login(props) {
           </Fab>
         </Grid>
 
-        {error && <Grid item><Typography>{error}</Typography></Grid>}
-
+        {error && (
+          <Grid item>
+            <Typography>{error}</Typography>
+          </Grid>
+        )}
       </Grid>
     </Container>
   );
 }
-
-Login.propTypes = {
-  history: PropTypes.object.isRequired,
-};
-
-export default withRouter(Login);

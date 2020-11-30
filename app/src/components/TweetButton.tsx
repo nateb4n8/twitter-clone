@@ -1,10 +1,10 @@
-import React from 'react';
 import Fab from '@material-ui/core/Fab';
 import { makeStyles } from '@material-ui/core/styles';
 import Create from '@material-ui/icons/Create';
-import ComposeTweet from './ComposeTweet';
+import React, { ReactElement } from 'react';
+import { ComposeTweet } from './ComposeTweet';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   extended: {
     width: '100%',
     textTransform: 'none',
@@ -25,8 +25,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-
-function TweetButton() {
+export function TweetButton(): ReactElement {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
 
@@ -53,5 +52,3 @@ function TweetButton() {
     </>
   );
 }
-
-export default TweetButton;

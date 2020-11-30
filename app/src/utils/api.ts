@@ -1,8 +1,11 @@
+import { FixMeLater } from '..';
 import { bannerImagePath, profileImagePath } from './config';
 
 const apiHost = `http://${window.location.hostname}:3001`;
 
-export async function fetchJoin(newUserDetails) {
+export async function fetchJoin(
+  newUserDetails: FixMeLater,
+): Promise<FixMeLater> {
   const res = await fetch(`${apiHost}/auth/signup`, {
     method: 'POST',
     headers: {
@@ -18,7 +21,10 @@ export async function fetchJoin(newUserDetails) {
   return data;
 }
 
-export async function fetchLogin({ email, password }) {
+export async function fetchLogin({
+  email,
+  password,
+}: FixMeLater): Promise<FixMeLater> {
   const res = await fetch(`${apiHost}/auth/signin`, {
     method: 'POST',
     headers: {
@@ -34,7 +40,7 @@ export async function fetchLogin({ email, password }) {
   throw new Error(data.error);
 }
 
-export async function fetchAuthN() {
+export async function fetchAuthN(): Promise<FixMeLater> {
   const res = await fetch(`${apiHost}/auth/signin`, {
     method: 'GET',
     credentials: 'include',
@@ -52,7 +58,7 @@ export async function fetchAuthN() {
   throw new Error(msg);
 }
 
-export async function fetchCurrentProfile() {
+export async function fetchCurrentProfile(): Promise<FixMeLater> {
   const res = await fetch(`${apiHost}/profile/`, { credentials: 'include' });
 
   const profile = await res.json();
@@ -61,7 +67,7 @@ export async function fetchCurrentProfile() {
   return {};
 }
 
-export async function fetchProfile(handle) {
+export async function fetchProfile(handle: FixMeLater): Promise<FixMeLater> {
   const res = await fetch(`${apiHost}/${handle}`, { credentials: 'include' });
 
   const profile = await res.json();
@@ -70,11 +76,13 @@ export async function fetchProfile(handle) {
   return {};
 }
 
-export async function fetchUpdateProfile(profile) {
+export async function fetchUpdateProfile(
+  profile: FixMeLater,
+): Promise<FixMeLater> {
   const formData = new FormData();
   Object.entries(profile).forEach(([name, value]) => {
     if (typeof value !== 'undefined' || value !== null) {
-      formData.append(name, value);
+      formData.append(name, value as FixMeLater);
     }
   });
 
@@ -92,7 +100,7 @@ export async function fetchUpdateProfile(profile) {
   return data;
 }
 
-export async function fetchTweets(handle) {
+export async function fetchTweets(handle: FixMeLater): Promise<FixMeLater> {
   const res = await fetch(`${apiHost}/tweet?handle=${handle}`, {
     credentials: 'include',
   });
@@ -103,7 +111,7 @@ export async function fetchTweets(handle) {
   return [];
 }
 
-export async function fetchFavorites(handle) {
+export async function fetchFavorites(handle: FixMeLater): Promise<FixMeLater> {
   const res = await fetch(`${apiHost}/favorite?handle=${handle}`, {
     credentials: 'include',
   });
@@ -114,7 +122,7 @@ export async function fetchFavorites(handle) {
   return [];
 }
 
-export async function fetchToggleFavorite(id) {
+export async function fetchToggleFavorite(id: FixMeLater): Promise<FixMeLater> {
   const res = await fetch(`${apiHost}/favorite?tweet=${id}`, {
     method: 'PUT',
     credentials: 'include',
@@ -126,7 +134,7 @@ export async function fetchToggleFavorite(id) {
   return [];
 }
 
-export async function fetchCreateTweet(tweet) {
+export async function fetchCreateTweet(tweet: FixMeLater): Promise<FixMeLater> {
   const res = await fetch(`${apiHost}/tweet`, {
     method: 'POST',
     headers: {

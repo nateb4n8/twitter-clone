@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Fab,
@@ -14,7 +14,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import GroupIcon from '@material-ui/icons/GroupOutlined';
 import MessageIcon from '@material-ui/icons/MessageOutlined';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   pane: {
     [theme.breakpoints.up('sm')]: {
       height: '100vh',
@@ -62,38 +62,60 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function Join() {
+export function Join(): ReactElement {
   const classes = useStyles();
 
   return (
     <Grid container className={classes.pane} alignItems="stretch">
       <Grid item md={6} className={classes.leftPanel}>
-        <Grid container justify="center" alignItems="center" className={classes.fullHeight}>
+        <Grid
+          container
+          justify="center"
+          alignItems="center"
+          className={classes.fullHeight}
+        >
           <List className={classes.list}>
             <ListItem>
-              <ListItemIcon><SearchIcon /></ListItemIcon>
+              <ListItemIcon>
+                <SearchIcon />
+              </ListItemIcon>
               <ListItemText primary="Follow your interests." />
             </ListItem>
             <ListItem>
-              <ListItemIcon><GroupIcon /></ListItemIcon>
+              <ListItemIcon>
+                <GroupIcon />
+              </ListItemIcon>
               <ListItemText primary="Hear what people are talking about." />
             </ListItem>
             <ListItem>
-              <ListItemIcon><MessageIcon /></ListItemIcon>
+              <ListItemIcon>
+                <MessageIcon />
+              </ListItemIcon>
               <ListItemText primary="Join the conversation." />
             </ListItem>
           </List>
         </Grid>
       </Grid>
       <Grid item md={6}>
-        <Grid container justify="center" alignItems="center" className={classes.fullHeight}>
-          <Grid container direction="column" alignItems="stretch" spacing={2} className={classes.content}>
+        <Grid
+          container
+          justify="center"
+          alignItems="center"
+          className={classes.fullHeight}
+        >
+          <Grid
+            container
+            direction="column"
+            alignItems="stretch"
+            spacing={2}
+            className={classes.content}
+          >
             <Grid item>
-              <Typography variant="h5">See what's happening in the world right now</Typography>
+              <Typography variant="h5">
+                See what&apos;s happening in the world right now
+              </Typography>
             </Grid>
-            <Grid item>
-              Join Twitter today.
-            </Grid>
+            <Grid item>Join Twitter today.</Grid>
             <Grid item>
               <Fab
                 variant="extended"

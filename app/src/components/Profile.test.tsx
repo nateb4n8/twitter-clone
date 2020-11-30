@@ -23,15 +23,18 @@ const validProfile = {
 };
 
 jest.mock('../utils/api', () => ({
-  fetchProfile: () => new Promise(resolve => resolve({
-    name: 'a',
-    profileImageSrc: 'b',
-    handle: 'c',
-    location: 'd',
-    // joinDate: 'e',
-    followingCount: 1,
-    followerCount: 3,
-  })),
+  fetchProfile: () =>
+    new Promise((resolve) =>
+      resolve({
+        name: 'a',
+        profileImageSrc: 'b',
+        handle: 'c',
+        location: 'd',
+        // joinDate: 'e',
+        followingCount: 1,
+        followerCount: 3,
+      }),
+    ),
 }));
 
 describe.skip('<Profile />', () => {
@@ -69,12 +72,12 @@ describe.skip('<Profile />', () => {
 
     const profileName = wrapper
       .find('h3')
-      .filterWhere(item => item.text() === validProps.profileName);
+      .filterWhere((item) => item.text() === validProps.profileName);
     expect(profileName.exists()).toBe(true);
 
     const handle = wrapper
       .find('span')
-      .filterWhere(item => item.text() === `@${validProps.handle}`);
+      .filterWhere((item) => item.text() === `@${validProps.handle}`);
     expect(handle.exists()).toBe(true);
   });
 
@@ -83,12 +86,12 @@ describe.skip('<Profile />', () => {
 
     const location = wrapper
       .find('span')
-      .filterWhere(item => item.text() === validProps.location);
+      .filterWhere((item) => item.text() === validProps.location);
     expect(location.exists()).toBe(true);
 
     const joinDate = wrapper
       .find('span')
-      .filterWhere(item => item.text() === `Joined ${validProps.joinDate}`);
+      .filterWhere((item) => item.text() === `Joined ${validProps.joinDate}`);
     expect(joinDate.exists()).toBe(true);
   });
 
@@ -99,12 +102,12 @@ describe.skip('<Profile />', () => {
 
     const followingText = wrapper
       .find('span')
-      .filterWhere(item => item.text() === `${followingAmt} Following`);
+      .filterWhere((item) => item.text() === `${followingAmt} Following`);
     expect(followingText.exists()).toBe(true);
 
     const followerText = wrapper
       .find('span')
-      .filterWhere(item => item.text() === `${followerAmt} Followers`);
+      .filterWhere((item) => item.text() === `${followerAmt} Followers`);
     expect(followerText.exists()).toBe(true);
   });
 
@@ -113,7 +116,7 @@ describe.skip('<Profile />', () => {
 
     const editButton = wrapper
       .find('button')
-      .filterWhere(btn => btn.props().name === 'editProfile');
+      .filterWhere((btn) => btn.props().name === 'editProfile');
     expect(editButton.exists()).toBe(true);
   });
 });

@@ -1,3 +1,3 @@
-const React = require('react');
+import React from 'react';
 
-module.exports = { ...React, useEffect: React.useLayoutEffect };
+export default { ...React, useEffect: React.useLayoutEffect };

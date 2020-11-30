@@ -1,11 +1,9 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import { Grid } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
+import React, { ReactElement } from 'react';
+import { MenuButton } from './MenuButton';
 
-import MenuButton from './MenuButton';
-
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   root: {
     [theme.breakpoints.down('md')]: {
       alignItems: 'center',
@@ -13,9 +11,20 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+export type NavigationItem = {
+  label: string;
+  link: string;
+  icon: ReactElement;
+};
 
-function Navigation({ items }) {
+type NavigationProps = { items: NavigationItem[] };
+
+export function Navigation(props: NavigationProps): ReactElement {
+  const { items = [] } = props;
   const classes = useStyles();
+
+  if (items.length === 0) return <></>;
+
   return (
     <Grid container direction="column" spacing={1} className={classes.root}>
       {items.map(({ label, link, icon }) => (
@@ -26,13 +35,3 @@ function Navigation({ items }) {
     </Grid>
   );
 }
-
-Navigation.defaultProps = {
-  items: [],
-};
-
-Navigation.propTypes = {
-  items: PropTypes.array,
-};
-
-export default Navigation;

@@ -1,24 +1,26 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import {
   Avatar,
+  Grid,
   IconButton,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
   Typography,
-  Grid,
 } from '@material-ui/core';
-import moment from 'moment';
 import { red } from '@material-ui/core/colors';
+import {
+  Favorite as FavoriteIcon,
+  FavoriteBorder as NonFavoriteIcon,
+} from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
-import { Favorite as FavoriteIcon, FavoriteBorder as NonFavoriteIcon } from '@material-ui/icons';
-import { fetchTweets, fetchFavorites, fetchToggleFavorite } from '../utils/api';
+import moment from 'moment';
+import React, { ReactElement, useEffect, useState } from 'react';
+import { fetchFavorites, fetchToggleFavorite, fetchTweets } from '../utils/api';
 import { profileImagePath } from '../utils/config';
+import { AppTheme } from './Theme';
 
-
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: AppTheme) => ({
   liRoot: {
     alignItems: 'flex-start',
     paddingTop: theme.spacing(1),
@@ -49,7 +51,7 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
-function formatTweetDate(date) {
+function formatTweetDate(date: string) {
   const createDate = moment(date);
   const now = moment();
 
@@ -71,37 +73,48 @@ function formatTweetDate(date) {
   return createDate.format('MMM D, YYYY');
 }
 
-function TweetList({ handle, getHandleTweets, favorites }) {
-  const classes = useStyles();
-  const [tweets, setTweets] = React.useState([]);
+type TweetListProps = {
+  handle: string;
+  getHandleTweets?: boolean;
+  favorites?: boolean;
+};
 
-  const getTweets = (targetHandle) => {
+type TweetSchema = {
+  body: string;
+  createdAt: string;
+  creatorHandle: string;
+  id: string;
+  isFavorite: boolean;
+};
+
+export function TweetList(props: TweetListProps): ReactElement {
+  const { handle, getHandleTweets = true, favorites = false } = props;
+  const classes = useStyles();
+  const [tweets, setTweets] = useState<TweetSchema[]>([]);
+
+  const getTweets = (targetHandle: string) => {
     if (favorites) {
-      fetchFavorites(targetHandle)
-        .then(setTweets)
-        .catch(console.error);
-    }
-    else {
-      fetchTweets(targetHandle)
-        .then(setTweets)
-        .catch(console.error);
+      fetchFavorites(targetHandle).then(setTweets).catch(console.error);
+    } else {
+      fetchTweets(targetHandle).then(setTweets).catch(console.error);
     }
   };
 
-  React.useEffect(() => {
-    getTweets(handle);
-  }, [handle, getHandleTweets]);
+  useEffect(() => getTweets(handle), [handle, getHandleTweets]);
 
-  const handleFavorite = async ({ id }) => {
+  const handleFavorite = async ({ id }: TweetSchema) => {
     try {
       await fetchToggleFavorite(id);
-      const nextTweets = tweets.map(t => (t.id !== id ? t : ({
-        ...t,
-        isFavorite: !t.isFavorite,
-      })));
+      const nextTweets = tweets.map((t) =>
+        t.id !== id
+          ? t
+          : {
+              ...t,
+              isFavorite: !t.isFavorite,
+            },
+      );
       setTweets(nextTweets);
-    }
-    catch (error) {
+    } catch (error) {
       console.error(error);
     }
   };
@@ -110,9 +123,8 @@ function TweetList({ handle, getHandleTweets, favorites }) {
     <>
       {tweets.length > 0 && (
         <List dense>
-          {tweets.map(tweet => (
+          {tweets.map((tweet) => (
             <ListItem key={tweet.id} className={classes.liRoot}>
-
               <ListItemAvatar className={classes.liAvatar}>
                 <Avatar
                   aria-label={`${tweet.creatorHandle} portrait`}
@@ -125,7 +137,7 @@ function TweetList({ handle, getHandleTweets, favorites }) {
               <ListItemText
                 className={classes.liText}
                 disableTypography
-                primary={(
+                primary={
                   <>
                     <Typography
                       component="span"
@@ -140,26 +152,27 @@ function TweetList({ handle, getHandleTweets, favorites }) {
                       {` ⋅ ${formatTweetDate(tweet.createdAt)}`}
                     </Typography>
                   </>
-                )}
-                secondary={(
+                }
+                secondary={
                   <Grid container>
                     <Grid item xs={12}>
-                      <Typography variant="caption">
-                        {tweet.body}
-                      </Typography>
+                      <Typography variant="caption">{tweet.body}</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                      <IconButton className={classes.favoriteButton} onClick={() => handleFavorite(tweet)}>
-                        {tweet.isFavorite === true
-                          ? <FavoriteIcon />
-                          : <NonFavoriteIcon />
-                        }
+                      <IconButton
+                        className={classes.favoriteButton}
+                        onClick={() => handleFavorite(tweet)}
+                      >
+                        {tweet.isFavorite === true ? (
+                          <FavoriteIcon />
+                        ) : (
+                          <NonFavoriteIcon />
+                        )}
                       </IconButton>
                     </Grid>
                   </Grid>
-                )}
+                }
               />
-
             </ListItem>
           ))}
         </List>
@@ -167,16 +180,3 @@ function TweetList({ handle, getHandleTweets, favorites }) {
     </>
   );
 }
-
-TweetList.defaultProps = {
-  getHandleTweets: true,
-  favorites: false,
-};
-
-TweetList.propTypes = {
-  handle: PropTypes.string.isRequired,
-  getHandleTweets: PropTypes.bool,
-  favorites: PropTypes.bool,
-};
-
-export default TweetList;

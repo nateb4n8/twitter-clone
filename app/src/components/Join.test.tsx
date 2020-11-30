@@ -25,23 +25,35 @@ describe('<Login />', () => {
   });
 
   it('renders without crashing', () => {
-    mount(<MemoryRouter><Join /></MemoryRouter>);
+    mount(
+      <MemoryRouter>
+        <Join />
+      </MemoryRouter>,
+    );
   });
 
   it('renders with a Log In link', () => {
-    const wrapper = mount(<MemoryRouter><Join /></MemoryRouter>);
+    const wrapper = mount(
+      <MemoryRouter>
+        <Join />
+      </MemoryRouter>,
+    );
     const loginAnchor = wrapper
       .find('a')
-      .filterWhere(a => a.props().href === '/login');
+      .filterWhere((a) => a.props().href === '/login');
 
     expect(loginAnchor.exists()).toBe(true);
   });
 
   it('renders with a Sign Up link', () => {
-    const wrapper = mount(<MemoryRouter><Join /></MemoryRouter>);
+    const wrapper = mount(
+      <MemoryRouter>
+        <Join />
+      </MemoryRouter>,
+    );
     const signupAnchor = wrapper
       .find('a')
-      .filterWhere(a => a.props().href === '/signup');
+      .filterWhere((a) => a.props().href === '/signup');
 
     expect(signupAnchor.exists()).toBe(true);
   });

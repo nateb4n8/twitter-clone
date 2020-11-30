@@ -1,10 +1,9 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import { Typography } from '@material-ui/core';
 import Fab from '@material-ui/core/Fab';
 import { makeStyles } from '@material-ui/core/styles';
-import { Typography } from '@material-ui/core';
+import React, { ReactElement } from 'react';
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme) => ({
   extended: {
     textTransform: 'none',
     [theme.breakpoints.down('md')]: {
@@ -21,8 +20,13 @@ const useStyles = makeStyles(theme => ({
   },
 }));
 
+type MenuButtonProps = {
+  label: string;
+  href: string;
+  icon: ReactElement;
+};
 
-function MenuButton(props) {
+export function MenuButton(props: MenuButtonProps): ReactElement {
   const { href, label, icon } = props;
   const classes = useStyles();
 
@@ -32,15 +36,9 @@ function MenuButton(props) {
         {icon}
         <Typography className={classes.label}>{label}</Typography>
       </Fab>
-      <Fab size="small" href={href} className={classes.round}>{icon}</Fab>
+      <Fab size="small" href={href} className={classes.round}>
+        {icon}
+      </Fab>
     </div>
   );
 }
-
-MenuButton.propTypes = {
-  label: PropTypes.string.isRequired,
-  href: PropTypes.string.isRequired,
-  icon: PropTypes.element.isRequired,
-};
-
-export default MenuButton;

@@ -18,7 +18,7 @@ describe.skip('<Login />', () => {
   beforeEach(() => {
     sinon.stub(console, 'error');
     mount = createMount();
-    mounter = component => mount(<MemoryRouter>{component}</MemoryRouter>);
+    mounter = (component) => mount(<MemoryRouter>{component}</MemoryRouter>);
   });
 
   afterEach(() => {
@@ -35,7 +35,7 @@ describe.skip('<Login />', () => {
 
     const emailInput = wrapper
       .find('input')
-      .filterWhere(input => input.props().type === 'email');
+      .filterWhere((input) => input.props().type === 'email');
 
     expect(emailInput.exists()).toBe(true);
   });
@@ -45,7 +45,7 @@ describe.skip('<Login />', () => {
 
     const passwordInput = wrapper
       .find('input')
-      .filterWhere(input => input.props().type === 'password');
+      .filterWhere((input) => input.props().type === 'password');
 
     expect(passwordInput.exists()).toBe(true);
   });
@@ -55,7 +55,7 @@ describe.skip('<Login />', () => {
 
     const loginAnchor = wrapper
       .find('a')
-      .filterWhere(a => a.props().href === '/login');
+      .filterWhere((a) => a.props().href === '/login');
 
     expect(loginAnchor.exists()).toBe(true);
   });

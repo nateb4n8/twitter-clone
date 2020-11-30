@@ -16,8 +16,8 @@ describe.skip('<Navigation />', () => {
     { label: 'Explore', link: '#explore' },
     { label: 'Notifications', link: '#notification' },
   ];
-  const labels = menuItems.map(i => i.label);
-  const links = menuItems.map(i => i.link);
+  const labels = menuItems.map((i) => i.label);
+  const links = menuItems.map((i) => i.link);
 
   let mount;
 
@@ -42,7 +42,9 @@ describe.skip('<Navigation />', () => {
     anchors.forEach((anchor) => {
       const text = anchor.text();
       const { href } = anchor.props();
-      const matches = menuItems.filter(item => item.label === text && item.link === href);
+      const matches = menuItems.filter(
+        (item) => item.label === text && item.link === href,
+      );
       matchCount += matches.length === 1 ? 1 : 0;
     });
 
@@ -52,7 +54,9 @@ describe.skip('<Navigation />', () => {
   it('renders with a compose Tweet link', () => {
     const wrapper = mount(<Navigation />);
 
-    const anchors = wrapper.find('a').findWhere(a => a.props().href && a.text() === 'Tweet');
+    const anchors = wrapper
+      .find('a')
+      .findWhere((a) => a.props().href && a.text() === 'Tweet');
 
     expect(anchors.length).toBe(1);
   });

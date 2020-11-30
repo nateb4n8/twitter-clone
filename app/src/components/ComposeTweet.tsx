@@ -1,25 +1,35 @@
-import React from 'react';
-import Fab from '@material-ui/core/Fab';
-import TextField from '@material-ui/core/TextField';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import Dialog from '@material-ui/core/Dialog';
-import useMediaQuery from '@material-ui/core/useMediaQuery';
-import DialogContent from '@material-ui/core/DialogContent';
-import IconButton from '@material-ui/core/IconButton';
-import Divider from '@material-ui/core/Divider';
-import FormLabel from '@material-ui/core/FormLabel';
-import { makeStyles, useTheme } from '@material-ui/styles';
-import ArrowBack from '@material-ui/icons/ArrowBack';
-import InsertPhoto from '@material-ui/icons/InsertPhoto';
-import Gif from '@material-ui/icons/Gif';
-import Poll from '@material-ui/icons/Poll';
-import Mood from '@material-ui/icons/Mood';
 import { CircularProgress } from '@material-ui/core';
 import { blue, orange, red } from '@material-ui/core/colors';
+import Dialog from '@material-ui/core/Dialog';
+import DialogContent from '@material-ui/core/DialogContent';
+import Divider from '@material-ui/core/Divider';
+import Fab from '@material-ui/core/Fab';
+import FormLabel from '@material-ui/core/FormLabel';
+import Grid from '@material-ui/core/Grid';
+import IconButton from '@material-ui/core/IconButton';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import ArrowBack from '@material-ui/icons/ArrowBack';
+import Gif from '@material-ui/icons/Gif';
+import InsertPhoto from '@material-ui/icons/InsertPhoto';
+import Mood from '@material-ui/icons/Mood';
+import Poll from '@material-ui/icons/Poll';
+import { makeStyles, useTheme } from '@material-ui/styles';
+import React, { ReactElement } from 'react';
 import { fetchCreateTweet } from '../utils/api';
+import { AppTheme } from './Theme';
 
-const useStyles = makeStyles(theme => ({
+type StyleProps = {
+  textLevel: 0 | 1 | 2;
+};
+
+function getLevelColor(props: StyleProps): string {
+  const { textLevel } = props;
+  return [blue[500], orange[500], red[500]][textLevel];
+}
+
+const useStyles = makeStyles(() => ({
   dialog: {
     borderRadius: '50%',
   },
@@ -37,27 +47,35 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1,
   },
   circularProgress: {
-    color: ({ textLevel }) => [blue[500], orange[500], red[500]][textLevel],
+    color: getLevelColor,
   },
 }));
 
+type ComposeTweetProps = {
+  open: boolean;
+  onClose: () => void;
+};
 
-function ComposeTweet({ open, onClose }) {
+export function ComposeTweet(props: ComposeTweetProps): ReactElement {
+  const { open, onClose } = props;
   const [text, setText] = React.useState('');
-  const textPercent = Math.round(text.length / 256 * 100);
-  const styleProps = { textLevel: 0 };
+  const textPercent = Math.round((text.length / 256) * 100);
+  const styleProps: StyleProps = { textLevel: 0 };
   if (textPercent > 50) styleProps.textLevel = 1;
   if (textPercent > 75) styleProps.textLevel = 2;
 
   const classes = useStyles(styleProps);
-  const theme = useTheme();
+  const theme = useTheme<AppTheme>();
   const fullScreen = useMediaQuery(theme.breakpoints.down('xs'));
   const paperProps = fullScreen ? {} : { className: classes.paper };
 
-  const handleSubmit = () => {
-    fetchCreateTweet({ text })
-      .then(onClose)
-      .catch(console.error);
+  const handleSubmit = async () => {
+    try {
+      await fetchCreateTweet({ text });
+    } catch (error) {
+      console.error(error);
+    }
+    onClose();
   };
 
   return (
@@ -102,7 +120,7 @@ function ComposeTweet({ open, onClose }) {
               name="tweet-content"
               rows={5}
               value={text}
-              onChange={e => setText(e.target.value)}
+              onChange={(e) => setText(e.target.value)}
               inputProps={{
                 maxLength: 256,
               }}
@@ -112,7 +130,7 @@ function ComposeTweet({ open, onClose }) {
             <Grid container alignItems="center">
               <Grid item>
                 <FormLabel htmlFor="add-image">
-                  <IconButton size="small" name="add-image" component="span">
+                  <IconButton size="small" component="span">
                     <InsertPhoto />
                   </IconButton>
                 </FormLabel>
@@ -155,5 +173,3 @@ function ComposeTweet({ open, onClose }) {
     </Dialog>
   );
 }
-
-export default ComposeTweet;

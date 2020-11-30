@@ -1,29 +1,33 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import {
+  AppBar,
   Fab,
   Grid,
-  makeStyles,
-  Typography,
   IconButton,
-  Tabs,
-  AppBar,
+  makeStyles,
   Tab,
+  Tabs,
+  Typography,
 } from '@material-ui/core';
 import {
-  Link as LinkIcon,
-  Place as LocationIcon,
   DateRange as JoinDateIcon,
   Edit as EditIcon,
-  Share as ShareIcon,
+  Link as LinkIcon,
   PersonAdd as PersonAddIcon,
+  Place as LocationIcon,
+  Share as ShareIcon,
 } from '@material-ui/icons';
-import EditProfile from './EditProfile';
-import { authContext } from './AuthContext';
+import React, { ReactElement } from 'react';
 import { bannerImagePath, profileImagePath } from '../utils/config';
-import TweetList from './TweetList';
+import { authContext } from './AuthContext';
+import { EditProfile } from './EditProfile';
+import { AppTheme } from './Theme';
+import { TweetList } from './TweetList';
 
-const useStyles = makeStyles((theme) => {
+type StyleProps = {
+  bannerImg: string;
+};
+
+const useStyles = makeStyles((theme: AppTheme) => {
   const imgHeight = 120;
   const borderWidth = theme.spacing(1);
 
@@ -37,7 +41,8 @@ const useStyles = makeStyles((theme) => {
     backgroundBanner: {
       width: '100%',
       height: 160,
-      background: ({ bannerImg }) => `center / cover no-repeat url(${bannerImg})`,
+      background: ({ bannerImg }: StyleProps) =>
+        `center / cover no-repeat url(${bannerImg})`,
     },
     profImg: {
       marginTop: -(imgHeight / 2 + borderWidth + theme.spacing(2)),
@@ -56,7 +61,12 @@ const useStyles = makeStyles((theme) => {
   };
 });
 
-function ProfileNotFound({ unknownHandle }) {
+type ProfileNotFoundProps = {
+  unknownHandle: string;
+};
+
+function ProfileNotFound(props: ProfileNotFoundProps) {
+  const { unknownHandle } = props;
   const classes = useStyles({
     bannerImg: `${bannerImagePath}${unknownHandle}`,
   });
@@ -75,10 +85,15 @@ function ProfileNotFound({ unknownHandle }) {
                 />
               </Grid>
               <Grid item>
-                <Typography variant="body1" component="span">{`@${unknownHandle}`}</Typography>
+                <Typography
+                  variant="body1"
+                  component="span"
+                >{`@${unknownHandle}`}</Typography>
               </Grid>
               <Grid item>
-                <Typography align="center" variant="body1">This account does not exist</Typography>
+                <Typography align="center" variant="body1">
+                  This account does not exist
+                </Typography>
               </Grid>
             </Grid>
           </Grid>
@@ -87,26 +102,43 @@ function ProfileNotFound({ unknownHandle }) {
     </div>
   );
 }
-ProfileNotFound.propTypes = {
-  unknownHandle: PropTypes.string.isRequired,
+
+export type ProfileSchema = {
+  name: string;
+  handle: string;
+  location: string;
+  followerCount: string;
+  followingCount: string;
+  joinDate: string;
+  website: string;
+  profileImageId: string;
+  bannerImageId: string;
 };
 
-function Profile(props) {
+type ProfileProps = Partial<
+  ProfileSchema & {
+    isCurrentUser: boolean;
+    handleNotFound: boolean;
+  }
+>;
+
+export function Profile(props: ProfileProps): ReactElement {
   const {
-    name,
-    handle,
-    location,
-    followerCount,
-    followingCount,
-    joinDate,
-    isCurrentUser,
-    website,
-    handleNotFound,
+    name = '',
+    handle = '',
+    location = '',
+    followerCount = '',
+    followingCount = '',
+    joinDate = '',
+    website = '',
+    isCurrentUser = false,
+    handleNotFound = false,
   } = props;
 
   const [view, setView] = React.useState('TWEETS');
   const [editOpen, setEditOpen] = React.useState(false);
-  const { profile: { profileImageId, bannerImageId } } = React.useContext(authContext);
+  const { profile } = React.useContext(authContext);
+  const { profileImageId = '', bannerImageId = '' } = profile || {};
 
   const classes = useStyles({
     bannerImg: `${bannerImagePath}${handle}?ts=${bannerImageId}`,
@@ -124,8 +156,7 @@ function Profile(props) {
     // remove protocol if present
     if (website.startsWith('http://')) {
       websiteDisplayText = website.slice(7);
-    }
-    else if (website.startsWith('https://')) {
+    } else if (website.startsWith('https://')) {
       websiteDisplayText = website.slice(8);
     }
 
@@ -135,11 +166,11 @@ function Profile(props) {
     }
   }
 
-  let profileMenu;
   if (handleNotFound) {
     return <ProfileNotFound unknownHandle={handle} />;
   }
 
+  let profileMenu;
   if (isCurrentUser) {
     profileMenu = (
       <Grid container justify="flex-end">
@@ -158,25 +189,16 @@ function Profile(props) {
         <EditProfile open={editOpen} onClose={() => setEditOpen(false)} />
       </Grid>
     );
-  }
-  else {
+  } else {
     profileMenu = (
       <Grid container justify="flex-end" spacing={1}>
         <Grid item>
-          <Fab
-            name=""
-            aria-label="follow user"
-            color="primary"
-          >
+          <Fab name="" aria-label="follow user" color="primary">
             <PersonAddIcon />
           </Fab>
         </Grid>
         <Grid item>
-          <Fab
-            name=""
-            aria-label="share user"
-            color="primary"
-          >
+          <Fab name="" aria-label="share user" color="primary">
             <ShareIcon />
           </Fab>
         </Grid>
@@ -199,34 +221,43 @@ function Profile(props) {
                 />
               </Grid>
               <Grid item>
-                <Typography component="h3" className={classes.profileName}>{name}</Typography>
+                <Typography component="h3" className={classes.profileName}>
+                  {name}
+                </Typography>
               </Grid>
               <Grid item>
-                <Typography variant="body1" component="span">{`@${handle}`}</Typography>
+                <Typography
+                  variant="body1"
+                  component="span"
+                >{`@${handle}`}</Typography>
               </Grid>
               <Grid item>
                 <Grid container alignItems="center">
                   {location && (
-                  <Grid item container alignItems="center">
-                    <LocationIcon fontSize="small" />
-                    <Typography variant="body1" component="span" className={classes.marginRight}>
-                      {location}
-                    </Typography>
-                  </Grid>
+                    <Grid item container alignItems="center">
+                      <LocationIcon fontSize="small" />
+                      <Typography
+                        variant="body1"
+                        component="span"
+                        className={classes.marginRight}
+                      >
+                        {location}
+                      </Typography>
+                    </Grid>
                   )}
                   {website && (
-                  <Grid item container alignItems="center">
-                    <LinkIcon fontSize="small" />
-                    <Typography
-                      variant="body1"
-                      className={classes.marginRight}
-                      component="a"
-                      href={website}
-                      target="_blank"
-                    >
-                      {websiteDisplayText}
-                    </Typography>
-                  </Grid>
+                    <Grid item container alignItems="center">
+                      <LinkIcon fontSize="small" />
+                      <Typography
+                        variant="body1"
+                        className={classes.marginRight}
+                        component="a"
+                        href={website}
+                        target="_blank"
+                      >
+                        {websiteDisplayText}
+                      </Typography>
+                    </Grid>
                   )}
                   <Grid item container alignItems="center">
                     <JoinDateIcon fontSize="small" />
@@ -237,7 +268,11 @@ function Profile(props) {
                 </Grid>
               </Grid>
               <Grid item>
-                <Typography variant="body1" component="span" className={classes.marginRight}>
+                <Typography
+                  variant="body1"
+                  component="span"
+                  className={classes.marginRight}
+                >
                   {`${followingCount} Following`}
                 </Typography>
                 <Typography variant="body1" component="span">
@@ -251,7 +286,12 @@ function Profile(props) {
           </Grid>
         </Grid>
       </div>
-      <AppBar position="static" color="default" elevation={0} className={classes.appBar}>
+      <AppBar
+        position="static"
+        color="default"
+        elevation={0}
+        className={classes.appBar}
+      >
         <Tabs
           value={view}
           onChange={(e, v) => setView(v)}
@@ -269,9 +309,3 @@ function Profile(props) {
     </div>
   );
 }
-Profile.defaultProps = {
-};
-Profile.propTypes = {
-};
-
-export default Profile;
