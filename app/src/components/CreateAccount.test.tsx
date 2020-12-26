@@ -66,9 +66,7 @@ describe('<CreateAccount />', () => {
   it('renders with a `confirmPassword` input', () => {
     const wrapper = arrange();
 
-    const confirmPasswordInput = wrapper
-      .find('input')
-      .find({ name: 'confirmPassword' });
+    const confirmPasswordInput = wrapper.find('input').find({ name: 'confirmPassword' });
 
     expect(confirmPasswordInput.exists()).toBe(true);
   });

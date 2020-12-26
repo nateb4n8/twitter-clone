@@ -1,10 +1,5 @@
 import React, { ComponentType, ReactElement } from 'react';
-import {
-  Redirect,
-  Route,
-  RouteComponentProps,
-  RouteProps,
-} from 'react-router-dom';
+import { Redirect, Route, RouteComponentProps, RouteProps } from 'react-router-dom';
 import { authContext } from './AuthContext';
 
 type PublicRouteProps = RouteProps & {
@@ -19,16 +14,11 @@ export function PublicRoute(props: PublicRouteProps): ReactElement {
   return (
     <Route
       {...rest}
-      render={(props) =>
+      render={(subProps) =>
         isAuthenticated === false ? (
-          <Component {...props} />
+          <Component {...subProps} />
         ) : (
-          <Redirect
-            to={{
-              pathname: redirectTo,
-              state: { from: props.location },
-            }}
-          />
+          <Redirect to={{ pathname: redirectTo, state: { from: subProps.location } }} />
         )
       }
     />

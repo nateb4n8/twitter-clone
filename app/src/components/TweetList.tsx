@@ -9,10 +9,7 @@ import {
   Typography,
 } from '@material-ui/core';
 import { red } from '@material-ui/core/colors';
-import {
-  Favorite as FavoriteIcon,
-  FavoriteBorder as NonFavoriteIcon,
-} from '@material-ui/icons';
+import { Favorite as FavoriteIcon, FavoriteBorder as NonFavoriteIcon } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/styles';
 import moment from 'moment';
 import React, { ReactElement, useEffect, useState } from 'react';
@@ -105,14 +102,7 @@ export function TweetList(props: TweetListProps): ReactElement {
   const handleFavorite = async ({ id }: TweetSchema) => {
     try {
       await fetchToggleFavorite(id);
-      const nextTweets = tweets.map((t) =>
-        t.id !== id
-          ? t
-          : {
-              ...t,
-              isFavorite: !t.isFavorite,
-            },
-      );
+      const nextTweets = tweets.map((t) => (t.id !== id ? t : { ...t, isFavorite: !t.isFavorite }));
       setTweets(nextTweets);
     } catch (error) {
       console.error(error);
@@ -163,11 +153,7 @@ export function TweetList(props: TweetListProps): ReactElement {
                         className={classes.favoriteButton}
                         onClick={() => handleFavorite(tweet)}
                       >
-                        {tweet.isFavorite === true ? (
-                          <FavoriteIcon />
-                        ) : (
-                          <NonFavoriteIcon />
-                        )}
+                        {tweet.isFavorite === true ? <FavoriteIcon /> : <NonFavoriteIcon />}
                       </IconButton>
                     </Grid>
                   </Grid>

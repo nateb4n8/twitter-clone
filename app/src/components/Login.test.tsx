@@ -1,47 +1,33 @@
-/* eslint-env jest */
-
 import React from 'react';
-import Enzyme from 'enzyme';
+import Enzyme, { mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
-import sinon from 'sinon';
-import { createMount } from '@material-ui/core/test-utils';
 import { MemoryRouter } from 'react-router-dom';
-
-import Login from './Login';
+import { Login } from './Login';
 
 Enzyme.configure({ adapter: new Adapter() });
 
-describe.skip('<Login />', () => {
-  let mount;
-  let mounter;
-
-  beforeEach(() => {
-    sinon.stub(console, 'error');
-    mount = createMount();
-    mounter = (component) => mount(<MemoryRouter>{component}</MemoryRouter>);
-  });
-
-  afterEach(() => {
-    console.error.restore();
-    mount.cleanUp();
-  });
+describe('<Login />', () => {
+  const arrange = () =>
+    mount(
+      <MemoryRouter>
+        <Login />
+      </MemoryRouter>,
+    );
 
   it('renders without crashing', () => {
-    mounter(<Login />);
+    arrange();
   });
 
   it('renders with an email text input', () => {
-    const wrapper = mounter(<Login />);
+    const wrapper = arrange();
 
-    const emailInput = wrapper
-      .find('input')
-      .filterWhere((input) => input.props().type === 'email');
+    const emailInput = wrapper.find('input').filterWhere((input) => input.props().type === 'email');
 
     expect(emailInput.exists()).toBe(true);
   });
 
   it('renders with a password text input', () => {
-    const wrapper = mounter(<Login />);
+    const wrapper = arrange();
 
     const passwordInput = wrapper
       .find('input')
@@ -51,11 +37,9 @@ describe.skip('<Login />', () => {
   });
 
   it('renders with a Log in link', () => {
-    const wrapper = mounter(<Login />);
+    const wrapper = arrange();
 
-    const loginAnchor = wrapper
-      .find('a')
-      .filterWhere((a) => a.props().href === '/login');
+    const loginAnchor = wrapper.find('a').filterWhere((a) => a.props().href === '/login');
 
     expect(loginAnchor.exists()).toBe(true);
   });

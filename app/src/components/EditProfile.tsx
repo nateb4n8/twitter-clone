@@ -16,6 +16,7 @@ import { Redirect } from 'react-router-dom';
 import { fetchUpdateProfile } from '../utils/api';
 import { bannerImagePath, profileImagePath } from '../utils/config';
 import { authContext } from './AuthContext';
+import { ProfileSchema } from './Profile';
 import { AppTheme } from './Theme';
 
 const ThemedLinearProgress = withStyles((theme: AppTheme) => ({
@@ -83,8 +84,7 @@ const useStyles = makeStyles((theme: AppTheme) => {
     backgroundBanner: {
       width: '100%',
       height: 160,
-      background: ({ bannerImg }: StyleProps) =>
-        `center / cover no-repeat url(${bannerImg})`,
+      background: ({ bannerImg }: StyleProps) => `center / cover no-repeat url(${bannerImg})`,
     },
     profImg: {
       marginTop: -(imgHeight / 2 + borderWidth + theme.spacing(2)),
@@ -95,8 +95,7 @@ const useStyles = makeStyles((theme: AppTheme) => {
       borderColor: 'rgba(0,0,0,0)',
       borderRadius: '50%',
       borderStyle: 'solid',
-      background: ({ src }: StyleProps) =>
-        `center grey / cover no-repeat url(${src})`,
+      background: ({ src }: StyleProps) => `center grey / cover no-repeat url(${src})`,
       '& button': {
         color: '#fff',
       },
@@ -145,14 +144,10 @@ export function EditProfile(props: EditProfileProps): ReactElement {
 
   const { open = false, onClose = () => undefined } = props;
 
-  const [profileImageSrc, setProfileImageSrc] = useState(
-    `${profileImagePath}${profile.handle}`,
-  );
+  const [profileImageSrc, setProfileImageSrc] = useState(`${profileImagePath}${profile.handle}`);
   const [profileImageFile, setProfileImageFile] = useState<File>();
 
-  const [bannerImageSrc, setBannerImageSrc] = useState(
-    `${bannerImagePath}${profile.handle}`,
-  );
+  const [bannerImageSrc, setBannerImageSrc] = useState(`${bannerImagePath}${profile.handle}`);
   const [bannerImageFile, setBannerImageFile] = useState<File>();
 
   const [nextName, setNextName] = useState(profile.name);
@@ -160,7 +155,6 @@ export function EditProfile(props: EditProfileProps): ReactElement {
   const [nextLocation, setNextLocation] = useState(profile.location);
   const [nextWebsite, setNextWebsite] = useState(profile.website);
 
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
   const theme = useTheme<AppTheme>();
@@ -191,43 +185,42 @@ export function EditProfile(props: EditProfileProps): ReactElement {
       bannerUrl: bannerImageSrc,
     };
 
-    if (_.isEqual(profile, nextProfile)) return onClose();
+    if (!_.isEqual(profile, nextProfile)) {
+      setLoading(true);
+      const filters = ['name', 'handle', 'location', 'website', 'profileImage', 'bannerImage'];
+      const payload = _.omitBy(
+        _.pick(
+          {
+            ...nextProfile,
+            profileImage: profileImageFile,
+            bannerImage: bannerImageFile,
+          },
+          filters,
+        ),
+        _.isNil,
+      );
 
-    const filters = [
-      'name',
-      'handle',
-      'location',
-      'website',
-      'profileImage',
-      'bannerImage',
-    ];
-    const payload = _.omitBy(
-      _.pick(
-        {
-          ...nextProfile,
-          profileImage: profileImageFile,
-          bannerImage: bannerImageFile,
-        },
-        filters,
-      ),
-      _.isNil,
-    );
-
-    setLoading(true);
-    const res = await fetchUpdateProfile(payload).catch(setError);
-    setLoading(false);
-
-    if (error) return console.error(error);
-
-    let { profileImageId, bannerImageId } = profile;
-    if (profileImageFile) {
-      profileImageId = `${new Date().getTime()}`;
+      try {
+        const res = await fetchUpdateProfile(payload as ProfileSchema);
+        let { profileImageId, bannerImageId } = profile;
+        if (profileImageFile) {
+          profileImageId = `${new Date().getTime()}`;
+        }
+        if (bannerImageFile) {
+          bannerImageId = `${new Date().getTime()}`;
+        }
+        setProfile({
+          ...profile,
+          ...res,
+          profileImageId,
+          bannerImageId,
+        });
+      } catch (error) {
+        console.error(error);
+      }
+      setLoading(false);
     }
-    if (bannerImageFile) {
-      bannerImageId = `${new Date().getTime()}`;
-    }
 
-    setProfile({ ...profile, ...res, profileImageId, bannerImageId });
     onClose();
   };
 
@@ -264,22 +257,12 @@ export function EditProfile(props: EditProfileProps): ReactElement {
       <DialogContent className={classes.content}>
         <Grid container justify="space-between">
           <Grid item>
-            <IconButton
-              name="close"
-              color="primary"
-              size="small"
-              onClick={onClose}
-            >
+            <IconButton name="close" color="primary" size="small" onClick={onClose}>
               <CloseIcon />
             </IconButton>
           </Grid>
           <Grid item>
-            <Fab
-              name="saveProfile"
-              variant="extended"
-              size="small"
-              color="primary"
-            >
+            <Fab name="saveProfile" variant="extended" size="small" color="primary">
               <Typography className={classes.save} onClick={handleSave}>
                 Save
               </Typography>
@@ -287,12 +270,7 @@ export function EditProfile(props: EditProfileProps): ReactElement {
           </Grid>
         </Grid>
         <div>
-          <Grid
-            container
-            justify="center"
-            alignItems="center"
-            className={classes.backgroundBanner}
-          >
+          <Grid container justify="center" alignItems="center" className={classes.backgroundBanner}>
             <input
               accept="image/*"
               className={classes.hidden}
@@ -300,21 +278,14 @@ export function EditProfile(props: EditProfileProps): ReactElement {
               type="file"
               onChange={handleImageChange}
             />
-            <label htmlFor="banner-edit-button">
-              <IconButton component="span" size="small">
-                <CameraIcon />
-              </IconButton>
-            </label>
+            <IconButton component="span" size="small">
+              <CameraIcon />
+            </IconButton>
           </Grid>
           <div style={{ padding: 16 }}>
             <Grid container spacing={2}>
               <Grid item>
-                <Grid
-                  container
-                  justify="center"
-                  alignItems="center"
-                  className={classes.profImg}
-                >
+                <Grid container justify="center" alignItems="center" className={classes.profImg}>
                   <input
                     accept="image/*"
                     className={classes.hidden}
@@ -322,11 +293,9 @@ export function EditProfile(props: EditProfileProps): ReactElement {
                     type="file"
                     onChange={handleImageChange}
                   />
-                  <label htmlFor="profile-image-edit-button">
-                    <IconButton size="small" name="editProfileImage">
-                      <CameraIcon />
-                    </IconButton>
-                  </label>
+                  <IconButton size="small" name="editProfileImage">
+                    <CameraIcon />
+                  </IconButton>
                 </Grid>
               </Grid>
             </Grid>
@@ -334,36 +303,16 @@ export function EditProfile(props: EditProfileProps): ReactElement {
         </div>
         <Grid container direction="column" spacing={3}>
           <Grid item>
-            <TextInput
-              label="Name"
-              value={nextName}
-              max={50}
-              onChange={setNextName}
-            />
+            <TextInput label="Name" value={nextName} max={50} onChange={setNextName} />
           </Grid>
           <Grid item>
-            <TextInput
-              label="Handle"
-              value={nextHandle}
-              max={160}
-              onChange={setNextHandle}
-            />
+            <TextInput label="Handle" value={nextHandle} max={160} onChange={setNextHandle} />
           </Grid>
           <Grid item>
-            <TextInput
-              label="Location"
-              value={nextLocation}
-              max={30}
-              onChange={setNextLocation}
-            />
+            <TextInput label="Location" value={nextLocation} max={30} onChange={setNextLocation} />
           </Grid>
           <Grid item>
-            <TextInput
-              label="Website"
-              value={nextWebsite}
-              max={128}
-              onChange={setNextWebsite}
-            />
+            <TextInput label="Website" value={nextWebsite} max={128} onChange={setNextWebsite} />
           </Grid>
         </Grid>
       </DialogContent>

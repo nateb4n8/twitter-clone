@@ -17,7 +17,7 @@ export type NavigationItem = {
   icon: ReactElement;
 };
 
-type NavigationProps = { items: NavigationItem[] };
+type NavigationProps = { items?: NavigationItem[] };
 
 export function Navigation(props: NavigationProps): ReactElement {
   const { items = [] } = props;

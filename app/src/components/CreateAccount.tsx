@@ -9,7 +9,6 @@ import { makeStyles, useTheme } from '@material-ui/styles';
 import { Formik } from 'formik';
 import React, { ReactElement } from 'react';
 import * as Yup from 'yup';
-import { FixMeLater } from '..';
 import { fetchJoin } from '../utils/api';
 import { authContext } from './AuthContext';
 import { AppTheme } from './Theme';
@@ -49,6 +48,13 @@ function TextInput(props: TextFieldProps) {
   );
 }
 
+type NewAccount = {
+  name: String;
+  email: String;
+  password: String;
+  confirmPassword: String;
+};
+
 export function CreateAccount(): ReactElement {
   const [submitting, setSubmitting] = React.useState(false);
   const [submitError, setSubmitError] = React.useState(null);
@@ -61,25 +67,30 @@ export function CreateAccount(): ReactElement {
 
   const paperProps = fullScreen ? {} : { className: classes.paper };
 
-  const handleSubmit = async ({ name, email, password }: FixMeLater) => {
+  const onSubmitHandler = async (values: NewAccount) => {
+    console.log('submitting');
+    const { name, email, password } = values;
     setSubmitting(true);
     setSubmitError(null);
-
-    const profile = await fetchJoin({ name, email, password }).catch((err) =>
-      setSubmitError(err.message),
-    );
-
-    setSubmitting(false);
-
-    if (!submitError) {
+    try {
+      const profile = await fetchJoin({ name, email, password });
       setProfile(profile);
+    } catch (error) {
+      setSubmitError(error.message);
     }
+    setSubmitting(false);
   };
 
+  const initialValues: NewAccount = {
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+  };
   return (
     <Formik
-      initialValues={{ name: '', email: '', password: '', confirmPassword: '' }}
-      onSubmit={handleSubmit}
+      initialValues={initialValues}
+      onSubmit={onSubmitHandler}
       validationSchema={Yup.object().shape({
         name: Yup.string().min(1).max(30).required('REQUIRED'),
         email: Yup.string().email().required('REQUIRED'),
@@ -92,12 +103,13 @@ export function CreateAccount(): ReactElement {
       })}
     >
       {(props) => {
-        const { values, errors, touched, isValid } = props as FixMeLater;
-        const { handleChange, handleBlur, handleSubmit } = props as FixMeLater;
+        const { values, errors, touched, isValid } = props;
+        const { handleChange, handleBlur, handleSubmit, submitForm } = props;
         const { password, confirmPassword } = values;
+        console.log({ props });
 
         return (
-          <form>
+          <form onSubmit={handleSubmit}>
             <Dialog
               open
               fullWidth
@@ -133,6 +145,7 @@ export function CreateAccount(): ReactElement {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       error={Boolean(errors.name && touched.name)}
+                      helperText={errors.name || ''}
                     />
                   </Grid>
                   <Grid item>
@@ -143,6 +156,7 @@ export function CreateAccount(): ReactElement {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       error={Boolean(errors.email && touched.email)}
+                      helperText={errors.email || ''}
                     />
                   </Grid>
                   <Grid item>
@@ -153,6 +167,7 @@ export function CreateAccount(): ReactElement {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       error={Boolean(errors.password && touched.password)}
+                      helperText={errors.password || ''}
                     />
                   </Grid>
                   <Grid item>
@@ -164,9 +179,9 @@ export function CreateAccount(): ReactElement {
                       onBlur={handleBlur}
                       error={Boolean(
                         touched.confirmPassword &&
-                          (password !== confirmPassword ||
-                            errors.confirmPassword),
+                          (password !== confirmPassword || errors.confirmPassword),
                       )}
+                      helperText={errors.confirmPassword || ''}
                     />
                   </Grid>
                 </Grid>
@@ -177,7 +192,8 @@ export function CreateAccount(): ReactElement {
                       variant="extended"
                       size="small"
                       color="primary"
-                      onClick={handleSubmit}
+                      type="button"
+                      onClick={submitForm}
                       disabled={!isValid || password !== confirmPassword}
                     >
                       <Typography className={classes.next}>Submit</Typography>

@@ -68,12 +68,7 @@ export function Join(): ReactElement {
   return (
     <Grid container className={classes.pane} alignItems="stretch">
       <Grid item md={6} className={classes.leftPanel}>
-        <Grid
-          container
-          justify="center"
-          alignItems="center"
-          className={classes.fullHeight}
-        >
+        <Grid container justify="center" alignItems="center" className={classes.fullHeight}>
           <List className={classes.list}>
             <ListItem>
               <ListItemIcon>
@@ -97,12 +92,7 @@ export function Join(): ReactElement {
         </Grid>
       </Grid>
       <Grid item md={6}>
-        <Grid
-          container
-          justify="center"
-          alignItems="center"
-          className={classes.fullHeight}
-        >
+        <Grid container justify="center" alignItems="center" className={classes.fullHeight}>
           <Grid
             container
             direction="column"
@@ -111,9 +101,7 @@ export function Join(): ReactElement {
             className={classes.content}
           >
             <Grid item>
-              <Typography variant="h5">
-                See what&apos;s happening in the world right now
-              </Typography>
+              <Typography variant="h5">See what&apos;s happening in the world right now</Typography>
             </Grid>
             <Grid item>Join Twitter today.</Grid>
             <Grid item>

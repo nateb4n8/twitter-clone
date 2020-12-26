@@ -44,9 +44,7 @@ export function Login(): ReactElement {
     setLoading(true);
     setError(null);
 
-    const res = await fetchLogin({ email, password }).catch((e) =>
-      setError(e.message),
-    );
+    const res = await fetchLogin({ email, password }).catch((e) => setError(e.message));
 
     setLoading(false);
 
@@ -76,8 +74,6 @@ export function Login(): ReactElement {
             name="email"
             label="Email"
             onChange={(e) => setEmail(e.target.value)}
-            // onBlur={handleBlur}
-            // error={Boolean(errors.email && touched.email)}
           />
         </Grid>
         <Grid item>
@@ -86,10 +82,7 @@ export function Login(): ReactElement {
             name="password"
             label="Password"
             onChange={(e) => setPassword(e.target.value)}
-            // onBlur={handleBlur}
-            // error={Boolean(errors.password && touched.password)}
           />
-          {/* <TextInput label="Password" type="password" onChange={e => setPassword(e.target.value)} /> */}
         </Grid>
         <Grid item>
           <Fab

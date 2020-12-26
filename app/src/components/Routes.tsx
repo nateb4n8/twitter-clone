@@ -1,10 +1,5 @@
 import React, { ReactElement, useContext } from 'react';
-import {
-  BrowserRouter as Router,
-  Redirect,
-  Route,
-  Switch,
-} from 'react-router-dom';
+import { BrowserRouter as Router, Redirect, Route, Switch } from 'react-router-dom';
 import { authContext } from './AuthContext';
 import { AuthRoute } from './AuthRoute';
 import { CreateAccount } from './CreateAccount';
@@ -32,18 +27,14 @@ export function Routes(): ReactElement {
         />
         <Route
           path="/login"
-          render={() =>
-            isAuthenticated === true ? <Redirect to="/home" /> : <Login />
-          }
+          render={() => (isAuthenticated === true ? <Redirect to="/home" /> : <Login />)}
         />
         <AuthRoute path="/home" component={Main} />
         <AuthRoute path="/:handle" component={Main} />
         <Route
           exact
           path="/"
-          render={() =>
-            isAuthenticated === true ? <Redirect to="/home" /> : <Join />
-          }
+          render={() => (isAuthenticated === true ? <Redirect to="/home" /> : <Join />)}
         />
         <Route render={() => <Redirect to="/" />} />
       </Switch>

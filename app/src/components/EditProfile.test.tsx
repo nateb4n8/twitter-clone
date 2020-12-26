@@ -58,9 +58,7 @@ describe('<EditProfile />', () => {
   it('renders an edit button for profile image', () => {
     const wrapper = arrange();
 
-    const editProfileImageButton = wrapper
-      .find('button')
-      .find({ name: 'editProfileImage' });
+    const editProfileImageButton = wrapper.find('button').find({ name: 'editProfileImage' });
 
     expect(editProfileImageButton.exists()).toBe(true);
   });

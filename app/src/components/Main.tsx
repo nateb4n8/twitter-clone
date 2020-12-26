@@ -11,7 +11,7 @@ import React, { ReactElement } from 'react';
 import { Route } from 'react-router-dom';
 import { Navigation, NavigationItem } from './Navigation';
 import ProfileData from './ProfileData';
-import TweetButton from './TweetButton';
+import { TweetButton } from './TweetButton';
 
 const useStyles = makeStyles((theme) => ({
   paper: {

@@ -10,12 +10,7 @@ type AuthRouteProps = {
 };
 
 export function AuthRoute(props: AuthRouteProps): ReactElement {
-  const {
-    component: Component,
-    redirectTo = '/login',
-    noRedirect,
-    ...rest
-  } = props;
+  const { component: Component, redirectTo = '/login', noRedirect, ...rest } = props;
 
   const { isAuthenticated, authenticating } = React.useContext(authContext);
 
@@ -41,6 +36,7 @@ export function AuthRoute(props: AuthRouteProps): ReactElement {
             />
           );
         }
+        return null;
       }}
     />
   );

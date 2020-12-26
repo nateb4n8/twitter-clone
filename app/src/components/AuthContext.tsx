@@ -59,8 +59,7 @@ export function Auth(props: AuthProps): ReactElement {
   const [state, dispatch] = React.useReducer(reducer, initialState);
 
   const setAuthenticating = () => dispatch({ type: 'AUTHENTICATING' });
-  const setProfile = (profile: ProfileSchema) =>
-    dispatch({ type: 'SET_PROFILE', profile });
+  const setProfile = (profile: ProfileSchema) => dispatch({ type: 'SET_PROFILE', profile });
   const reset = () => dispatch({ type: 'RESET' });
 
   React.useEffect(() => {

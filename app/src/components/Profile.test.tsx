@@ -1,26 +1,6 @@
-/* eslint-env jest */
-
 import React from 'react';
-// import Enzyme from 'enzyme';
-// import Adapter from 'enzyme-adapter-react-16';
-import sinon from 'sinon';
-// import { createMount } from '@material-ui/core/test-utils';
-// import { act } from 'react-testing-library';
-import { render, fireEvent, getByTestId, act } from '@testing-library/react';
-
-import Profile from './Profile';
-
-// Enzyme.configure({ adapter: new Adapter() });
-
-const validProfile = {
-  name: 'a',
-  profileImageSrc: 'b',
-  handle: 'c',
-  location: 'd',
-  // joinDate: 'e',
-  followingCount: 1,
-  followerCount: 3,
-};
+import { FixMeLater } from '..';
+import { Profile } from './Profile';
 
 jest.mock('../utils/api', () => ({
   fetchProfile: () =>
@@ -38,20 +18,13 @@ jest.mock('../utils/api', () => ({
 }));
 
 describe.skip('<Profile />', () => {
-  let mount;
-  let validProps;
+  let mount: FixMeLater;
+  let validProps: FixMeLater;
 
   beforeEach(() => {
     validProps = {
       joinDate: 'e',
     };
-    sinon.stub(console, 'error');
-    // mount = createMount();
-  });
-
-  afterEach(() => {
-    console.error.restore();
-    // mount.cleanUp();
   });
 
   it('renders without crashing', () => {
@@ -59,7 +32,7 @@ describe.skip('<Profile />', () => {
   });
 
   it('renders with a primary profile image', () => {
-    const { container } = renderer.create(<Profile {...validProps} />);
+    const { container } = mount(<Profile {...validProps} />);
 
     console.log(container.querySelector('img'));
 
@@ -72,12 +45,12 @@ describe.skip('<Profile />', () => {
 
     const profileName = wrapper
       .find('h3')
-      .filterWhere((item) => item.text() === validProps.profileName);
+      .filterWhere((item: FixMeLater) => item.text() === validProps.profileName);
     expect(profileName.exists()).toBe(true);
 
     const handle = wrapper
       .find('span')
-      .filterWhere((item) => item.text() === `@${validProps.handle}`);
+      .filterWhere((item: FixMeLater) => item.text() === `@${validProps.handle}`);
     expect(handle.exists()).toBe(true);
   });
 
@@ -86,12 +59,12 @@ describe.skip('<Profile />', () => {
 
     const location = wrapper
       .find('span')
-      .filterWhere((item) => item.text() === validProps.location);
+      .filterWhere((item: FixMeLater) => item.text() === validProps.location);
     expect(location.exists()).toBe(true);
 
     const joinDate = wrapper
       .find('span')
-      .filterWhere((item) => item.text() === `Joined ${validProps.joinDate}`);
+      .filterWhere((item: FixMeLater) => item.text() === `Joined ${validProps.joinDate}`);
     expect(joinDate.exists()).toBe(true);
   });
 
@@ -102,12 +75,12 @@ describe.skip('<Profile />', () => {
 
     const followingText = wrapper
       .find('span')
-      .filterWhere((item) => item.text() === `${followingAmt} Following`);
+      .filterWhere((item: FixMeLater) => item.text() === `${followingAmt} Following`);
     expect(followingText.exists()).toBe(true);
 
     const followerText = wrapper
       .find('span')
-      .filterWhere((item) => item.text() === `${followerAmt} Followers`);
+      .filterWhere((item: FixMeLater) => item.text() === `${followerAmt} Followers`);
     expect(followerText.exists()).toBe(true);
   });
 
@@ -116,7 +89,7 @@ describe.skip('<Profile />', () => {
 
     const editButton = wrapper
       .find('button')
-      .filterWhere((btn) => btn.props().name === 'editProfile');
+      .filterWhere((btn: FixMeLater) => btn.props().name === 'editProfile');
     expect(editButton.exists()).toBe(true);
   });
 });

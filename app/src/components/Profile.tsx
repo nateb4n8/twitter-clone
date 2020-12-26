@@ -41,8 +41,7 @@ const useStyles = makeStyles((theme: AppTheme) => {
     backgroundBanner: {
       width: '100%',
       height: 160,
-      background: ({ bannerImg }: StyleProps) =>
-        `center / cover no-repeat url(${bannerImg})`,
+      background: ({ bannerImg }: StyleProps) => `center / cover no-repeat url(${bannerImg})`,
     },
     profImg: {
       marginTop: -(imgHeight / 2 + borderWidth + theme.spacing(2)),
@@ -85,10 +84,9 @@ function ProfileNotFound(props: ProfileNotFoundProps) {
                 />
               </Grid>
               <Grid item>
-                <Typography
-                  variant="body1"
-                  component="span"
-                >{`@${unknownHandle}`}</Typography>
+                <Typography variant="body1" component="span">
+                  {`@${unknownHandle}`}
+                </Typography>
               </Grid>
               <Grid item>
                 <Typography align="center" variant="body1">
@@ -226,21 +224,16 @@ export function Profile(props: ProfileProps): ReactElement {
                 </Typography>
               </Grid>
               <Grid item>
-                <Typography
-                  variant="body1"
-                  component="span"
-                >{`@${handle}`}</Typography>
+                <Typography variant="body1" component="span">
+                  {`@${handle}`}
+                </Typography>
               </Grid>
               <Grid item>
                 <Grid container alignItems="center">
                   {location && (
                     <Grid item container alignItems="center">
                       <LocationIcon fontSize="small" />
-                      <Typography
-                        variant="body1"
-                        component="span"
-                        className={classes.marginRight}
-                      >
+                      <Typography variant="body1" component="span" className={classes.marginRight}>
                         {location}
                       </Typography>
                     </Grid>
@@ -268,11 +261,7 @@ export function Profile(props: ProfileProps): ReactElement {
                 </Grid>
               </Grid>
               <Grid item>
-                <Typography
-                  variant="body1"
-                  component="span"
-                  className={classes.marginRight}
-                >
+                <Typography variant="body1" component="span" className={classes.marginRight}>
                   {`${followingCount} Following`}
                 </Typography>
                 <Typography variant="body1" component="span">
@@ -286,12 +275,7 @@ export function Profile(props: ProfileProps): ReactElement {
           </Grid>
         </Grid>
       </div>
-      <AppBar
-        position="static"
-        color="default"
-        elevation={0}
-        className={classes.appBar}
-      >
+      <AppBar position="static" color="default" elevation={0} className={classes.appBar}>
         <Tabs
           value={view}
           onChange={(e, v) => setView(v)}

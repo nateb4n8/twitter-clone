@@ -1,11 +1,10 @@
 import { FixMeLater } from '..';
+import { ProfileSchema } from '../components/Profile';
 import { bannerImagePath, profileImagePath } from './config';
 
 const apiHost = `http://${window.location.hostname}:3001`;
 
-export async function fetchJoin(
-  newUserDetails: FixMeLater,
-): Promise<FixMeLater> {
+export async function fetchJoin(newUserDetails: FixMeLater): Promise<FixMeLater> {
   const res = await fetch(`${apiHost}/auth/signup`, {
     method: 'POST',
     headers: {
@@ -21,10 +20,7 @@ export async function fetchJoin(
   return data;
 }
 
-export async function fetchLogin({
-  email,
-  password,
-}: FixMeLater): Promise<FixMeLater> {
+export async function fetchLogin({ email, password }: FixMeLater): Promise<FixMeLater> {
   const res = await fetch(`${apiHost}/auth/signin`, {
     method: 'POST',
     headers: {
@@ -67,22 +63,20 @@ export async function fetchCurrentProfile(): Promise<FixMeLater> {
   return {};
 }
 
-export async function fetchProfile(handle: FixMeLater): Promise<FixMeLater> {
+export async function fetchProfile(handle: String): Promise<ProfileSchema> {
   const res = await fetch(`${apiHost}/${handle}`, { credentials: 'include' });
 
   const profile = await res.json();
   if (res.status === 200) return profile;
 
-  return {};
+  throw new Error('NOOOOOOOO');
 }
 
-export async function fetchUpdateProfile(
-  profile: FixMeLater,
-): Promise<FixMeLater> {
+export async function fetchUpdateProfile(profile: ProfileSchema): Promise<FixMeLater> {
   const formData = new FormData();
   Object.entries(profile).forEach(([name, value]) => {
     if (typeof value !== 'undefined' || value !== null) {
-      formData.append(name, value as FixMeLater);
+      formData.append(name, value);
     }
   });
 
