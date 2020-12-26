@@ -6,11 +6,12 @@
   "scripts": {
     "app": "cd app && npm start",
     "server": "cd server && npm start",
-    "containers": "docker-compose -f ./docker/docker-compose.yml up",
+    "setup:containers": "docker-compose -f ./docker/docker-compose.yml up",
+    "teardown:containers": "docker-compose -f ./docker/docker-compose.yml down",
     "setup:app": "cd app && npm install",
     "setup:server": "cd server && npm install",
     "setup": "npm install && npm run setup:app && npm run setup:server",
-    "test:app": "cd app && CI=true npm test",
+    "test:app": "cd app && npm test",
     "test:server": "cd server && npm run test:once",
     "test": "npm run test:app && npm run test:server"
   },
@@ -29,7 +30,7 @@
   },
   "homepage": "https://github.com/logic0verflow/twitter-clone#readme",
   "devDependencies": {
-    "husky": "^3.0.1"
+    "husky": "^4.3.6"
   },
   "husky": {
     "hooks": {
