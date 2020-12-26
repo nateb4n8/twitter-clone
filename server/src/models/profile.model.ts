@@ -1,11 +1,11 @@
-const Joi = require('@hapi/joi');
-const Jimp = require('jimp');
+import Joi from '@hapi/joi';
+import Jimp from 'jimp';
 
-const schema = Joi.object({
+export const profileSchema = Joi.object({
   name: Joi.string().min(1).max(64).required(),
   handle: Joi.string().min(1).max(36).required(),
   // email: Joi.string().email({ minDomainSegments: 2 }).required(),
-  
+
   location: Joi.string().max(128).allow(''),
   website: Joi.string().max(128).allow(''),
   profileImage: Joi.object({
@@ -13,7 +13,3 @@ const schema = Joi.object({
     mimetype: Joi.string().valid(Jimp.MIME_JPEG).required(),
   }),
 }).required();
-
-
-// exports.User = User;
-exports.profileSchema = schema

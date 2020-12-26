@@ -1,14 +1,18 @@
-// const winston = require('winston');
-const Joi = require('@hapi/joi');
-const jwt = require('jsonwebtoken');
-const winston = require('winston');
-const { jwtSecret, assetStore } = require('../../startup/config');
+import Joi from '@hapi/joi';
+import jwt from 'jsonwebtoken';
+import { ObjectId } from 'mongodb';
+import winston from 'winston';
+import { config } from '../startup/config';
 
-const schema = Joi.object({
+const { jwtSecret, imageAssetsPath } = config;
+
+export const userSchema = Joi.object({
   name: Joi.string().min(1).max(30).required(),
   email: Joi.string().email({ minDomainSegments: 2 }).required(),
-  password: Joi.string().regex(/^[a-zA-Z0-9]{5,30}$/).required(),
-  
+  password: Joi.string()
+    .regex(/^[a-zA-Z0-9]{5,30}$/)
+    .required(),
+
   handle: Joi.string().min(1).max(30),
   location: Joi.string().min(1).max(64),
   followingCount: Joi.number().min(0),
@@ -19,8 +23,34 @@ const schema = Joi.object({
   favoriteTweets: Joi.array().items(Joi.string().min(1).max(30)),
 }).required();
 
-class User {
-  constructor({ 
+export class User {
+  _id?: any;
+
+  name: any;
+
+  email: any;
+
+  password: any;
+
+  handle?: any;
+
+  location?: any;
+
+  followingCount?: any;
+
+  followerCount?: any;
+
+  profileImageSrc?: any;
+
+  followers?: any;
+
+  following?: any;
+
+  favoriteTweets?: ObjectId[];
+
+  joinDate?: Date;
+
+  constructor({
     _id,
     name,
     email,
@@ -33,7 +63,8 @@ class User {
     followers,
     following,
     favoriteTweets,
-  }) {
+    joinDate,
+  }: Partial<User>) {
     this._id = _id;
     this.name = name;
     this.email = email;
@@ -43,10 +74,11 @@ class User {
     this.location = location || '';
     this.followingCount = followingCount || 0;
     this.followerCount = followerCount || 0;
-    this.profileImageSrc = profileImageSrc || `${assetStore}/profileImages/${this.handle}`;
+    this.profileImageSrc = profileImageSrc || `${imageAssetsPath}/profileImages/${this.handle}`;
     this.followers = followers || [];
     this.following = following || [];
     this.favoriteTweets = favoriteTweets || [];
+    this.joinDate = joinDate || new Date();
   }
 
   generateAuthToken() {
@@ -54,13 +86,13 @@ class User {
       return winston.error('cannot make auth token with undefined id');
     }
 
-    const token = jwt.sign({ 
-      id: this._id,
-      handle: this.handle,
-    }, jwtSecret);
+    const token = jwt.sign(
+      {
+        id: this._id,
+        handle: this.handle,
+      },
+      jwtSecret,
+    );
     return token;
   }
 }
-
-exports.User = User;
-exports.userSchema = schema;
