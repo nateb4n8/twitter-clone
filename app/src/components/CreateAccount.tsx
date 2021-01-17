@@ -1,3 +1,4 @@
+import { gql, useMutation } from '@apollo/client';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import Fab from '@material-ui/core/Fab';
@@ -9,8 +10,8 @@ import { makeStyles, useTheme } from '@material-ui/styles';
 import { Formik } from 'formik';
 import React, { ReactElement } from 'react';
 import * as Yup from 'yup';
-import { fetchJoin } from '../utils/api';
-import { authContext } from './AuthContext';
+import { Login } from '../generated/graphql';
+import { useSessionContext } from './session/Session';
 import { AppTheme } from './Theme';
 
 const useStyles = makeStyles({
@@ -55,30 +56,49 @@ type NewAccount = {
   confirmPassword: String;
 };
 
+const CREATE_USER = gql`
+  mutation CreateUser($createUserInput: CreateUserInput!) {
+    createUser(createUserInput: $createUserInput) {
+      accessToken
+      user {
+        id
+        username
+        location
+        createdAt
+      }
+    }
+  }
+`;
+
 export function CreateAccount(): ReactElement {
-  const [submitting, setSubmitting] = React.useState(false);
-  const [submitError, setSubmitError] = React.useState(null);
-
-  const { setProfile } = React.useContext(authContext);
-
   const classes = useStyles();
+  const [createUser, { error }] = useMutation<Login>(CREATE_USER);
+  const { setLogin } = useSessionContext();
+
   const theme = useTheme<AppTheme>();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
 
   const paperProps = fullScreen ? {} : { className: classes.paper };
 
   const onSubmitHandler = async (values: NewAccount) => {
-    console.log('submitting');
-    const { name, email, password } = values;
-    setSubmitting(true);
-    setSubmitError(null);
+    const { email, password } = values;
     try {
-      const profile = await fetchJoin({ name, email, password });
-      setProfile(profile);
-    } catch (error) {
-      setSubmitError(error.message);
+      const { data, errors } = await createUser({
+        variables: {
+          createUserInput: {
+            username: email,
+            password,
+          },
+        },
+      });
+      if (errors !== undefined || data === undefined || data === null) {
+        throw new Error('Failed to create new User');
+      }
+
+      setLogin(data);
+    } catch (ee) {
+      console.error(ee);
     }
-    setSubmitting(false);
   };
 
   const initialValues: NewAccount = {
@@ -106,8 +126,6 @@ export function CreateAccount(): ReactElement {
         const { values, errors, touched, isValid } = props;
         const { handleChange, handleBlur, handleSubmit, submitForm } = props;
         const { password, confirmPassword } = values;
-        console.log({ props });
-
         return (
           <form onSubmit={handleSubmit}>
             <Dialog
@@ -126,7 +144,6 @@ export function CreateAccount(): ReactElement {
                   alignItems="stretch"
                   className={classes.form}
                 >
-                  {submitting && <h1>SUBMITTING</h1>}
                   <Grid item>
                     <Typography className={classes.bold} variant="h6">
                       Create your account
@@ -134,7 +151,7 @@ export function CreateAccount(): ReactElement {
                   </Grid>
                   <Grid item>
                     <Typography className={classes.bold} variant="h6">
-                      {submitError}
+                      {error}
                     </Typography>
                   </Grid>
                   <Grid item>

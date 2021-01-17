@@ -1,16 +1,8 @@
 import { NotFoundException } from '@nestjs/common';
-import {
-  Args,
-  Mutation,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-} from '@nestjs/graphql';
+import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { FollowService } from 'src/follow/follow.service';
 import { Tweet } from 'src/tweet/tweet.model';
 import { TweetService } from 'src/tweet/tweet.service';
-import { CreateUserInput } from './create-user.input';
 import { User } from './user.model';
 import { UserService } from './user.service';
 
@@ -21,13 +13,6 @@ export class UserResolver {
     private tweetService: TweetService,
     private followService: FollowService,
   ) {}
-
-  @Mutation(() => User)
-  createUser(
-    @Args('createUserInput') createUserInput: CreateUserInput,
-  ): Promise<User> {
-    return this.userService.create(createUserInput);
-  }
 
   @Query((_returns) => User, { name: 'user' })
   async getUser(@Args('username') username: string): Promise<User> {

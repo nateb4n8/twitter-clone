@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react';
-import { Route, Redirect, RouteComponentProps } from 'react-router-dom';
-import { authContext } from './AuthContext';
+import { Redirect, Route, RouteComponentProps } from 'react-router-dom';
+import { useSessionContext } from './session/Session';
 
 type AuthRouteProps = {
   component: React.ComponentType<RouteComponentProps>;
@@ -12,18 +12,14 @@ type AuthRouteProps = {
 export function AuthRoute(props: AuthRouteProps): ReactElement {
   const { component: Component, redirectTo = '/login', noRedirect, ...rest } = props;
 
-  const { isAuthenticated, authenticating } = React.useContext(authContext);
+  const { accessToken } = useSessionContext();
 
   return (
     <Route
       {...rest}
       render={(renderProps) => {
-        if (isAuthenticated) {
+        if (accessToken) {
           return <Component {...renderProps} />;
-        }
-
-        if (authenticating) {
-          return null;
         }
 
         if (!noRedirect) {

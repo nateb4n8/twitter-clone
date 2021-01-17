@@ -1,3 +1,4 @@
+import { gql, useMutation } from '@apollo/client';
 import { makeStyles } from '@material-ui/core';
 import Container from '@material-ui/core/Container';
 import Fab from '@material-ui/core/Fab';
@@ -5,8 +6,8 @@ import Grid from '@material-ui/core/Grid';
 import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import React, { ChangeEvent, ReactElement } from 'react';
-import { fetchLogin } from '../utils/api';
-import { authContext } from './AuthContext';
+import { Login } from '../generated/graphql';
+import { useSessionContext } from './session/Session';
 
 const useStyles = makeStyles(() => ({
   button: {
@@ -28,29 +29,44 @@ function TextInput(props: TextFieldProps) {
   );
 }
 
-export function Login(): ReactElement {
-  const { setProfile } = React.useContext(authContext);
+const LOGIN = gql`
+  mutation Login($loginInput: LoginUserInput!) {
+    login(loginUserInput: $loginInput) {
+      accessToken
+      user {
+        username
+        id
+        createdAt
+      }
+    }
+  }
+`;
+
+export function LoginForm(): ReactElement {
+  const classes = useStyles();
+  const { setLogin } = useSessionContext();
+  const [login, { loading }] = useMutation<Login>(LOGIN);
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
-  const [error, setError] = React.useState(null);
-  const [loading, setLoading] = React.useState(false);
-
-  const classes = useStyles();
 
   const handleSubmit = async (event: ChangeEvent<unknown>) => {
     event.preventDefault();
 
-    setLoading(true);
-    setError(null);
+    const { data, errors } = await login({
+      variables: {
+        loginInput: {
+          username: email,
+          password,
+        },
+      },
+    });
 
-    const res = await fetchLogin({ email, password }).catch((e) => setError(e.message));
-
-    setLoading(false);
-
-    if (res) {
-      setProfile(res);
+    if (errors || data === null || data === undefined) {
+      console.error('Login failed');
+      return;
     }
+    setLogin(data);
   };
 
   return (
@@ -95,12 +111,12 @@ export function Login(): ReactElement {
             Log in
           </Fab>
         </Grid>
-
+        {/* 
         {error && (
           <Grid item>
             <Typography>{error}</Typography>
           </Grid>
-        )}
+        )} */}
       </Grid>
     </Container>
   );

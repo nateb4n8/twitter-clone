@@ -2,7 +2,7 @@ import React from 'react';
 import Enzyme, { mount } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 import { MemoryRouter } from 'react-router-dom';
-import { Login } from './Login';
+import { LoginForm } from './LoginForm';
 
 Enzyme.configure({ adapter: new Adapter() });
 
@@ -10,7 +10,7 @@ describe('<Login />', () => {
   const arrange = () =>
     mount(
       <MemoryRouter>
-        <Login />
+        <LoginForm />
       </MemoryRouter>,
     );
 
