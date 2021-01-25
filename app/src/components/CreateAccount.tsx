@@ -10,7 +10,7 @@ import { makeStyles, useTheme } from '@material-ui/styles';
 import { Formik } from 'formik';
 import React, { ReactElement } from 'react';
 import * as Yup from 'yup';
-import { Login } from '../generated/graphql';
+import { User } from '../generated/graphql';
 import { useSessionContext } from './session/Session';
 import { AppTheme } from './Theme';
 
@@ -50,60 +50,56 @@ function TextInput(props: TextFieldProps) {
 }
 
 type NewAccount = {
-  name: String;
-  email: String;
+  username: String;
   password: String;
   confirmPassword: String;
 };
 
-const CREATE_USER = gql`
-  mutation CreateUser($createUserInput: CreateUserInput!) {
-    createUser(createUserInput: $createUserInput) {
-      accessToken
-      user {
-        id
-        username
-        location
-        createdAt
-      }
+const SIGN_UP = gql`
+  mutation Signup($username: String!, $password: String!) {
+    createUser(createUserInput: { username: $username, password: $password }) {
+      username
+      id
     }
+    login(username: $username, password: $password)
   }
 `;
 
+type SignUp = {
+  createUser: User;
+  login: string;
+};
+
 export function CreateAccount(): ReactElement {
   const classes = useStyles();
-  const [createUser, { error }] = useMutation<Login>(CREATE_USER);
-  const { setLogin } = useSessionContext();
-
   const theme = useTheme<AppTheme>();
   const fullScreen = useMediaQuery(theme.breakpoints.down('sm'));
-
   const paperProps = fullScreen ? {} : { className: classes.paper };
 
+  const { setAccessToken, setUser } = useSessionContext();
+  const [createUser, { error }] = useMutation<SignUp>(SIGN_UP);
+
   const onSubmitHandler = async (values: NewAccount) => {
-    const { email, password } = values;
+    const { username, password } = values;
     try {
       const { data, errors } = await createUser({
         variables: {
-          createUserInput: {
-            username: email,
-            password,
-          },
+          username,
+          password,
         },
       });
       if (errors !== undefined || data === undefined || data === null) {
         throw new Error('Failed to create new User');
       }
-
-      setLogin(data);
+      setUser(data.createUser);
+      setAccessToken(data.login);
     } catch (ee) {
       console.error(ee);
     }
   };
 
   const initialValues: NewAccount = {
-    name: '',
-    email: '',
+    username: '',
     password: '',
     confirmPassword: '',
   };
@@ -112,8 +108,7 @@ export function CreateAccount(): ReactElement {
       initialValues={initialValues}
       onSubmit={onSubmitHandler}
       validationSchema={Yup.object().shape({
-        name: Yup.string().min(1).max(30).required('REQUIRED'),
-        email: Yup.string().email().required('REQUIRED'),
+        username: Yup.string().min(1).max(30).required('REQUIRED'),
         password: Yup.string()
           .matches(/^[a-zA-Z0-9]{3,30}$/)
           .required('Required'),
@@ -157,23 +152,12 @@ export function CreateAccount(): ReactElement {
                   <Grid item>
                     <TextInput
                       type="text"
-                      name="name"
-                      label="Name"
+                      name="username"
+                      label="Username"
                       onChange={handleChange}
                       onBlur={handleBlur}
-                      error={Boolean(errors.name && touched.name)}
-                      helperText={errors.name || ''}
-                    />
-                  </Grid>
-                  <Grid item>
-                    <TextInput
-                      type="email"
-                      name="email"
-                      label="Email"
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={Boolean(errors.email && touched.email)}
-                      helperText={errors.email || ''}
+                      error={Boolean(errors.username && touched.username)}
+                      helperText={errors.username || ''}
                     />
                   </Grid>
                   <Grid item>

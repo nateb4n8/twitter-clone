@@ -1,25 +1,29 @@
 import React, { createContext, useContext, useState } from 'react';
-import { Login, User } from '../../generated/graphql';
+import { User } from '../../generated/graphql';
 
 type SessionContext = {
-  setLogin: (login: Login) => void;
+  setAccessToken: (token: string) => void;
+  setUser: (user: User) => void;
   accessToken?: string;
   user?: User;
 };
 
 const sessionContext = createContext<SessionContext>({
-  setLogin: (): void => undefined,
+  setAccessToken: (): void => undefined,
+  setUser: (): void => undefined,
 });
 
 type SessionProps = { children: React.ReactNode };
 
 export function Session({ children }: SessionProps) {
-  const [login, setLogin] = useState<Login>();
+  const [accessToken, setAccessToken] = useState<string>();
+  const [user, setUser] = useState<User>();
 
   const value: SessionContext = {
-    setLogin,
-    accessToken: login?.accessToken,
-    user: login?.user,
+    setAccessToken,
+    setUser,
+    accessToken,
+    user,
   };
 
   return <sessionContext.Provider value={value}>{children}</sessionContext.Provider>;

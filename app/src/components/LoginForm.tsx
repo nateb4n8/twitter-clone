@@ -6,7 +6,6 @@ import Grid from '@material-ui/core/Grid';
 import TextField, { TextFieldProps } from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 import React, { ChangeEvent, ReactElement } from 'react';
-import { Login } from '../generated/graphql';
 import { useSessionContext } from './session/Session';
 
 const useStyles = makeStyles(() => ({
@@ -30,24 +29,17 @@ function TextInput(props: TextFieldProps) {
 }
 
 const LOGIN = gql`
-  mutation Login($loginInput: LoginUserInput!) {
-    login(loginUserInput: $loginInput) {
-      accessToken
-      user {
-        username
-        id
-        createdAt
-      }
-    }
+  mutation Login($username: String!, $password: String!) {
+    login(username: $username, password: $password)
   }
 `;
 
 export function LoginForm(): ReactElement {
   const classes = useStyles();
-  const { setLogin } = useSessionContext();
-  const [login, { loading }] = useMutation<Login>(LOGIN);
+  const { setAccessToken } = useSessionContext();
+  const [login, { loading }] = useMutation<string>(LOGIN);
 
-  const [email, setEmail] = React.useState('');
+  const [username, setUsername] = React.useState('');
   const [password, setPassword] = React.useState('');
 
   const handleSubmit = async (event: ChangeEvent<unknown>) => {
@@ -55,10 +47,8 @@ export function LoginForm(): ReactElement {
 
     const { data, errors } = await login({
       variables: {
-        loginInput: {
-          username: email,
-          password,
-        },
+        username,
+        password,
       },
     });
 
@@ -66,7 +56,7 @@ export function LoginForm(): ReactElement {
       console.error('Login failed');
       return;
     }
-    setLogin(data);
+    setAccessToken(data);
   };
 
   return (
@@ -86,10 +76,10 @@ export function LoginForm(): ReactElement {
 
         <Grid item>
           <TextInput
-            type="email"
-            name="email"
-            label="Email"
-            onChange={(e) => setEmail(e.target.value)}
+            type="username"
+            name="username"
+            label="Username"
+            onChange={(e) => setUsername(e.target.value)}
           />
         </Grid>
         <Grid item>

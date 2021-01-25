@@ -1,3 +1,4 @@
+import { gql } from '@apollo/client';
 export type Maybe<T> = T | null;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
@@ -20,6 +21,7 @@ export type Follow = {
   followee: Scalars['String'];
   createdAt: Scalars['DateTime'];
 };
+
 
 export type Tweet = {
   __typename?: 'Tweet';
@@ -45,21 +47,17 @@ export type User = {
   tweets: Array<Tweet>;
 };
 
-export type Login = {
-  __typename?: 'Login';
-  accessToken: Scalars['String'];
-  user: User;
-};
-
 export type Query = {
   __typename?: 'Query';
   user: User;
   tweet: Tweet;
 };
 
+
 export type QueryUserArgs = {
   username: Scalars['String'];
 };
+
 
 export type QueryTweetArgs = {
   id: Scalars['String'];
@@ -71,27 +69,33 @@ export type Mutation = {
   createTweet: Tweet;
   createFollow: Follow;
   deleteFollow: Follow;
-  login: Login;
+  login: Scalars['String'];
 };
+
 
 export type MutationCreateUserArgs = {
   createUserInput: CreateUserInput;
 };
 
+
 export type MutationCreateTweetArgs = {
   createTweetInput: CreateTweetInput;
 };
+
 
 export type MutationCreateFollowArgs = {
   id: Scalars['String'];
 };
 
+
 export type MutationDeleteFollowArgs = {
   id: Scalars['String'];
 };
 
+
 export type MutationLoginArgs = {
-  loginUserInput: LoginUserInput;
+  password: Scalars['String'];
+  username: Scalars['String'];
 };
 
 export type CreateUserInput = {
@@ -101,9 +105,4 @@ export type CreateUserInput = {
 
 export type CreateTweetInput = {
   body: Scalars['String'];
-};
-
-export type LoginUserInput = {
-  username: Scalars['String'];
-  password: Scalars['String'];
 };
