@@ -1,12 +1,9 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { FollowModelDefinition } from './follow.model';
+import { FollowServiceModule } from './follow-service.module';
 import { FollowResolver } from './follow.resolver';
-import { FollowService } from './follow.service';
 
 @Module({
-  imports: [MongooseModule.forFeature([FollowModelDefinition])],
-  providers: [FollowService, FollowResolver],
-  exports: [FollowService],
+  imports: [FollowServiceModule],
+  providers: [FollowResolver],
 })
 export class FollowModule {}

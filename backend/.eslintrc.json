@@ -32,7 +32,8 @@
         }
     ],
     "@typescript-eslint/no-unused-vars": ["error", {
-        "argsIgnorePattern": "_type|_returns"
+        "argsIgnorePattern": "_type|_returns",
+        "ignoreRestSiblings": true
     }]
   }
 }

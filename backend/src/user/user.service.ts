@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { Model } from 'mongoose';
 import { CreateUserInput } from './create-user.input';
 import { User, UserDocument } from './user.model';
 
@@ -15,7 +15,7 @@ export class UserService {
     return user.save();
   }
 
-  async getById(id: string): Promise<User | null> {
+  async getById(id: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ id });
   }
 

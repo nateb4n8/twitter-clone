@@ -1,8 +1,16 @@
-import { NotFoundException } from '@nestjs/common';
-import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
+import { ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { FollowService } from 'src/follow/follow.service';
 import { Tweet } from 'src/tweet/tweet.model';
 import { TweetService } from 'src/tweet/tweet.service';
+import { CreateUserInput } from './create-user.input';
 import { User } from './user.model';
 import { UserService } from './user.service';
 
@@ -13,6 +21,18 @@ export class UserResolver {
     private tweetService: TweetService,
     private followService: FollowService,
   ) {}
+
+  @Mutation(() => User)
+  async createUser(
+    @Args('createUserInput') createUserInput: CreateUserInput,
+  ): Promise<Partial<User>> {
+    const user = await this.userService.getByUsername(createUserInput.username);
+    if (user !== null) {
+      throw new ConflictException('Username already exist');
+    }
+
+    return this.userService.create(createUserInput);
+  }
 
   @Query((_returns) => User, { name: 'user' })
   async getUser(@Args('username') username: string): Promise<User> {

@@ -1,6 +1,6 @@
 import { Field, ID, ObjectType } from '@nestjs/graphql';
 import { ModelDefinition, Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { IsUUID, Length } from 'class-validator';
+import { IsNotEmpty, IsUUID, Length } from 'class-validator';
 import { Document } from 'mongoose';
 import { classValidator } from 'src/schema.hooks';
 import { User } from 'src/user/user.model';
@@ -17,6 +17,7 @@ export class Tweet {
   @Prop()
   @Field((_type) => User)
   @IsUUID(4)
+  @IsNotEmpty()
   author: string;
 
   @Prop()

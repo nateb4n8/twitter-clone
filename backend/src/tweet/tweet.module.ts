@@ -1,16 +1,10 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { UserModelDefinition } from 'src/user/user.model';
-import { UserService } from 'src/user/user.service';
-import { TweetModelDefinition } from './tweet.model';
+import { UserServiceModule } from 'src/user/user-service.module';
+import { TweetServiceModule } from './tweet-service.module';
 import { TweetResolver } from './tweet.resolver';
-import { TweetService } from './tweet.service';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([TweetModelDefinition, UserModelDefinition]),
-  ],
-  providers: [TweetService, TweetResolver, UserService],
-  exports: [TweetService],
+  imports: [TweetServiceModule, UserServiceModule],
+  providers: [TweetResolver],
 })
 export class TweetModule {}
