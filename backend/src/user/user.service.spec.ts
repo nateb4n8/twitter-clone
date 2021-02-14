@@ -5,32 +5,32 @@ import * as bcrypt from 'bcrypt';
 import { User, UserDocument } from './user.model';
 import { UserService } from './user.service';
 
-const mockUserModel = jest.fn().mockReturnValue(jest.fn());
+type SetupItems = {
+  userService: UserService;
+  userModel: Model<UserDocument>;
+};
+
+async function setup(): Promise<SetupItems> {
+  const module = await Test.createTestingModule({
+    providers: [
+      UserService,
+      {
+        provide: getModelToken(User.name),
+        useFactory: jest.fn().mockReturnValue(jest.fn()),
+      },
+    ],
+  }).compile();
+  const userService = await module.get(UserService);
+  const userModel = await module.get(getModelToken(User.name));
+  return { userService, userModel };
+}
 
 describe('UserService', () => {
-  let userService: UserService;
-  let userModel: Model<UserDocument>;
-
-  beforeEach(async () => {
-    const module = await Test.createTestingModule({
-      providers: [
-        UserService,
-        {
-          provide: getModelToken(User.name),
-          useFactory: mockUserModel,
-        },
-      ],
-    }).compile();
-    userService = await module.get(UserService);
-    userModel = await module.get(getModelToken(User.name));
-  });
-
   describe('create', () => {
     const user = { username: 'a', password: 'b' };
-    beforeEach(() => {});
-
     it('encrypts users password before saving', async () => {
       let passwordWhenSaved = '';
+      const { userService, userModel } = await setup();
       jest
         .spyOn(userModel.prototype, 'constructor')
         .mockImplementationOnce(() => ({
@@ -47,6 +47,7 @@ describe('UserService', () => {
     });
 
     it('returns created user', async () => {
+      const { userService, userModel } = await setup();
       jest
         .spyOn(userModel.prototype, 'constructor')
         .mockImplementationOnce(() => ({
@@ -63,6 +64,7 @@ describe('UserService', () => {
   describe('getById', () => {
     it('returns a user', async () => {
       const expected = ('a' as unknown) as Query<UserDocument, UserDocument>;
+      const { userService, userModel } = await setup();
       userModel.findOne = jest.fn().mockResolvedValueOnce(expected);
 
       const actual = await userService.getById('');
@@ -74,6 +76,7 @@ describe('UserService', () => {
   describe('getByUsername', () => {
     it('returns a user', async () => {
       const expected = ('a' as unknown) as Query<UserDocument, UserDocument>;
+      const { userService, userModel } = await setup();
       userModel.findOne = jest.fn().mockResolvedValueOnce(expected);
 
       const actual = await userService.getByUsername('');
@@ -84,6 +87,7 @@ describe('UserService', () => {
 
   describe('getManyByIds', () => {
     it('returns an array of users', async () => {
+      const { userService, userModel } = await setup();
       const expected = ['a', 'b'];
       userModel.find = jest.fn().mockResolvedValueOnce(expected);
 
